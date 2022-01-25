@@ -2,6 +2,7 @@
 from .. import db, flask_bcrypt
 import datetime
 from app.main.model.blacklist import BlacklistToken
+from app.main.enum.position_type import PositionType
 from ..config import key
 import jwt
 from typing import Union
@@ -13,10 +14,12 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    employee_number = db.Column(db.String(255), unique=True, nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    position = db.Column(db.String(1), default=PositionType.staff.value)
     public_id = db.Column(db.String(100), unique=True)
-    username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(100))
 
     @property
@@ -69,5 +72,15 @@ class User(db.Model):
         except jwt.InvalidTokenError:
             return 'Invalid token. Please log in again.'
 
+    def __str__(self):
+        return f"<User '{self.name}' and user's position is {self.position}>"
+
     def __repr__(self):
-        return "<User '{}'>".format(self.username)
+        return f"""
+            User: (
+                name: {self.name},
+                employee_number: {self.employee_number},
+                position: {self.position},
+                admin: {self.admin},
+            )
+        """

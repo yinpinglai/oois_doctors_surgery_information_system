@@ -12,7 +12,9 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         new_user = User(
             public_id=str(uuid.uuid4()),
             email=data['email'],
-            username=data['username'],
+            name=data['name'],
+            employee_number=data['employee_number'],
+            position=data['position'],
             password=data['password'],
             registered_on=datetime.datetime.utcnow()
         )

@@ -2,6 +2,7 @@ import unittest
 
 from app.main import db
 from app.main.model.blacklist import BlacklistToken
+from app.main.enum.position_type import PositionType
 import json
 from app.test.base import BaseTestCase
 
@@ -11,7 +12,9 @@ def register_user(self):
         '/user/',
         data=json.dumps(dict(
             email='joe@gmail.com',
-            username='username',
+            name='name',
+            employee_number='sf001',
+            position=PositionType.receptionist.value,
             password='123456'
         )),
         content_type='application/json'

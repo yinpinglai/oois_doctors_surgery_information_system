@@ -37,7 +37,7 @@ class Auth:
     @staticmethod
     def logout_user(data: str) -> Tuple[Dict[str, str], int]:
         if data:
-            auth_token = data.split(" ")[1]
+            auth_token = data
         else:
             auth_token = ''
         if auth_token:
@@ -65,15 +65,14 @@ class Auth:
         if auth_token:
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
-                print(resp)
                 user = User.query.filter_by(id=resp).first()
-                print('kris user: ' + str(user.id) + ', ' + str(user.admin))
                 response_object = {
                     'status': 'success',
                     'data': {
                         'user_id': user.id,
                         'email': user.email,
                         'admin': user.admin,
+                        'position': user.position,
                         'registered_on': str(user.registered_on)
                     }
                 }
