@@ -3,6 +3,7 @@ import datetime
 
 from app.main import db
 from app.main.model.user import User
+from app.main.util.response import produce_common_response_dict
 from typing import Dict, Tuple
 
 
@@ -21,10 +22,10 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         save_changes(new_user)
         return generate_token(new_user)
     else:
-        response_object = {
-            'status': 'fail',
-            'message': 'User already exists. Please Log in.',
-        }
+        response_object = produce_common_response_dict(
+            is_success=False,
+            message='User already exists. Please Log in.',
+        )
         return response_object, 409
 
 
@@ -40,18 +41,21 @@ def generate_token(user: User) -> Tuple[Dict[str, str], int]:
     try:
         # generate the auth token
         auth_token = User.encode_auth_token(user.id)
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully registered.',
-			'id': user.public_id,
-            'Authorization': auth_token.decode(),
-        }
+        response_object = produce_common_response_dict(
+            is_success=True,
+            message='Successfully registered.',
+            payload={
+                'id': user.public_id,
+                'Authorization': auth_token.decode(),
+            },
+        )
         return response_object, 201
     except Exception as e:
-        response_object = {
-            'status': 'fail',
-            'message': 'Some error occurred. Please try again.'
-        }
+        print(e)
+        response_object = produce_common_response_dict(
+            is_success=False,
+            message='Some error occurred. Please try again.',
+        )
         return response_object, 401
 
 
