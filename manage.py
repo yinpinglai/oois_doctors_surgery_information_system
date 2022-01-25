@@ -6,7 +6,7 @@ from flask_script import Manager
 
 from app import blueprint
 from app.main import create_app, db
-from app.main.model import user, blacklist
+
 
 app = create_app(os.getenv('APP_ENVIRONMENT') or 'dev')
 app.register_blueprint(blueprint)
@@ -18,7 +18,6 @@ manager = Manager(app)
 migrate = Migrate(app, db)
 
 manager.add_command('db', MigrateCommand)
-
 
 @manager.command
 def run():
