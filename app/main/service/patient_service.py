@@ -38,7 +38,7 @@ def get_all_patients():
     return Patient.query.all()
 
 
-def get_a_patient(public_id):
+def get_a_patient(public_id: str):
     return Patient.query.filter_by(public_id=public_id).first()
 
 

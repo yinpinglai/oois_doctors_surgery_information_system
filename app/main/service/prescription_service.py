@@ -47,7 +47,7 @@ def save_new_prescription(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         return response_object, 201
 
 
-def update_a_prescription(public_id, data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
+def update_a_prescription(public_id: str, data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     prescription = Prescription.query.filter_by(public_id=public_id).first()
 
     if not prescription:
@@ -87,7 +87,7 @@ def get_all_prescritpions():
     return Prescription.query.all()
 
 
-def get_a_prescription(public_id):
+def get_a_prescription(public_id: str):
     return Prescription.query.filter_by(public_id=public_id).first()
 
 

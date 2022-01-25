@@ -4,8 +4,8 @@ from app.main.enum.prescription_type import PrescriptionType
 
 
 class Prescription(db.Model):
-	""" Prescription Model for storing prescription related details"""
-	__tablename__ = "prescription"
+	''' Prescription Model for storing prescription related details '''
+	__tablename__ = 'prescription'
 
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	type = db.Column(db.String(1), nullable=False, default=PrescriptionType.standard.value)

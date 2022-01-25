@@ -10,18 +10,19 @@ from sqlalchemy.sql import func
 
 
 class User(db.Model):
-    """ User Model for storing user related details """
-    __tablename__ = "user"
+    ''' User Model for storing user related details '''
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(100))
     name = db.Column(db.String(255), unique=True, nullable=False)
     employee_number = db.Column(db.String(255), unique=True, nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False, default=func.now())
-    admin = db.Column(db.Boolean, nullable=False, default=False)
     position = db.Column(db.String(1), default=PositionType.staff.value)
+    admin = db.Column(db.Boolean, nullable=False, default=False)
+    appointments = db.relationship('Appointment')
+    registered_on = db.Column(db.DateTime, nullable=False, default=func.now())
     public_id = db.Column(db.String(100), unique=True)
-    password_hash = db.Column(db.String(100))
 
     @property
     def password(self):
@@ -84,5 +85,6 @@ class User(db.Model):
                 employee_number: {self.employee_number},
                 position: {self.position},
                 admin: {self.admin},
+                appointments: {repr(self.appointments)},
             )
         """
