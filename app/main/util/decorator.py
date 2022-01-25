@@ -44,6 +44,7 @@ def admin_token_required(f: Callable) -> Callable:
 
     return decorated
 
+
 def receptionist_token_required(f: Callable) -> Callable:
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -61,11 +62,12 @@ def receptionist_token_required(f: Callable) -> Callable:
                 'message': 'receptionist token required'
             }
             return response_object, 401
-        
+
         return f(*args, **kwargs)
     return decorated
 
-def healthcare_professional_token_required(f: Callable) -> Callable:
+
+def doctor_token_required(f: Callable) -> Callable:
     @wraps(f)
     def decorated(*args, **kwargs):
 
@@ -76,12 +78,35 @@ def healthcare_professional_token_required(f: Callable) -> Callable:
             return data, status
 
         position = token.get('position')
-        if position != PositionType.doctor.value and position != PositionType.nurse.value:
+        if position != PositionType.doctor.value:
             response_object = {
                 'status': 'fail',
-                'message': 'healthcare professional token required'
+                'message': 'doctor token required'
             }
             return response_object, 401
-        
+
         return f(*args, **kwargs)
     return decorated
+
+
+def nurse_token_required(f: Callable) -> Callable:
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        data, status = Auth.get_logged_in_user(request)
+        token = data.get('data')
+
+        if not token:
+            return data, status
+
+        position = token.get('position')
+        if position != PositionType.nurse.value:
+            response_object = {
+                'status': 'fail',
+                'message': 'nurse token required'
+            }
+            return response_object, 401
+
+        return f(*args, **kwargs)
+    return decorated
+

@@ -20,6 +20,7 @@ def save_new_patient(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
 		return {
             'status': 'success',
             'message': 'Successfully registered.',
+			'id': new_patient.public_id,
         }, 201
 	else:
 		response_object = {

@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
-from app.main.util.decorator import token_required
+from app.main.util.decorator import token_required, receptionist_token_required
 from ..util.dto import PatientDto
 from ..service.patient_service import save_new_patient, get_all_patients, get_a_patient
 from typing import Dict, Tuple
@@ -22,8 +22,9 @@ class PatientList(Resource):
     @api.expect(_patient, validate=True)
     @api.response(201, 'Patient successfully created.')
     @api.doc('create a new patient')
+    @receptionist_token_required
     def post(self) -> Tuple[Dict[str, str], int]:
-        """Creates a new Patient """
+        """Creates a new patient """
         data = request.json
         return save_new_patient(data=data)
 
@@ -36,7 +37,7 @@ class Patient(Resource):
     @token_required
     @api.marshal_with(_patient)
     def get(self, public_id):
-        """get a patient given its identifier"""
+        """Get a patient given its identifier"""
         patient = get_a_patient(public_id)
         if not patient:
             api.abort(404)
