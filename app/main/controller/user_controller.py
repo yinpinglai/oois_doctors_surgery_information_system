@@ -43,5 +43,3 @@ class User(Resource):
         else:
             return user
 
-
-

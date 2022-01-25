@@ -16,7 +16,7 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             employee_number=data['employee_number'],
             position=data['position'],
             password=data['password'],
-            registered_on=datetime.datetime.utcnow()
+            registered_on=datetime.datetime.utcnow(),
         )
         save_changes(new_user)
         return generate_token(new_user)

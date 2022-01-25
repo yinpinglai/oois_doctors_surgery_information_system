@@ -1,6 +1,16 @@
 from flask_restx import Namespace, fields
 
 
+class PatientDto:
+	api = Namespace('patient', description='patient related operations')
+	patient = api.model('patient', {
+		'name': fields.String(required=True, description='patient name'),
+		'address': fields.String(required=True, description='patient address'),
+		'phone': fields.String(required=True, description='patient phone'),
+		'public_id': fields.String(description='patient Identifier')
+	})
+
+
 class UserDto:
     api = Namespace('user', description='user related operations')
     user = api.model('user', {

@@ -6,6 +6,7 @@ from app.main.enum.position_type import PositionType
 from ..config import key
 import jwt
 from typing import Union
+from sqlalchemy.sql import func
 
 
 class User(db.Model):
@@ -16,7 +17,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     name = db.Column(db.String(255), unique=True, nullable=False)
     employee_number = db.Column(db.String(255), unique=True, nullable=False)
-    registered_on = db.Column(db.DateTime, nullable=False)
+    registered_on = db.Column(db.DateTime, nullable=False, default=func.now())
     admin = db.Column(db.Boolean, nullable=False, default=False)
     position = db.Column(db.String(1), default=PositionType.staff.value)
     public_id = db.Column(db.String(100), unique=True)
@@ -78,6 +79,7 @@ class User(db.Model):
     def __repr__(self):
         return f"""
             User: (
+				id: {self.id},
                 name: {self.name},
                 employee_number: {self.employee_number},
                 position: {self.position},
