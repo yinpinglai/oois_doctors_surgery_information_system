@@ -1,5 +1,8 @@
 #### Doctors' Surgery System
 
+### Environment Setup
+- Python 3.7
+
 ### Terminal commands
 Note: make sure you have `pip` and `virtualenv` installed.
 

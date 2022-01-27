@@ -1,9 +1,9 @@
+import json
 import unittest
 
 from app.main import db
 from app.main.model.blacklist import BlacklistToken
 from app.main.enum.position_type import PositionType
-import json
 from app.test.base import BaseTestCase
 
 
