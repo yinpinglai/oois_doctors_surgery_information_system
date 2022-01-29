@@ -16,6 +16,7 @@ class Config:
     API_PREFIX = 'api'
     AUTH_API_LOGIN_RESOURCE_URL = 'auth/login'
     AUTH_API_LOGOUT_RESOURCE_URL = 'auth/logout'
+    AUTH_API_USER_INFO_URL = 'auth/user/info'
 
 
 class DevelopmentConfig(Config):

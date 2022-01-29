@@ -1,6 +1,10 @@
 from typing import Dict, Tuple
 from ..config import Config
 from .base_service import BaseService
+from client.model.employee import Employee
+from client.enum.position_type import PositionType
+from client.factory.employee import EmployeeFactory
+from client.exception.unauthenticated_exception import UnauthenticatedException
 
 class AuthService(BaseService):
 
@@ -48,4 +52,27 @@ class AuthService(BaseService):
         except:
             return False
 
+
+    def user_info(self, token: str) -> Employee:
+        '''
+        Get logged in user info from the system
+
+        :param token - the access token
+        :return employee - an employee instance
+        '''
+        resource_url = self.config.AUTH_API_USER_INFO_URL
+        try:
+            self.set_headers({
+                'Authorization': token,
+            })
+            status_code, data = self.post(resource_url)
+            is_success = data['is_success']
+
+            if status_code == 200 and is_success:
+                payload = data['payload']
+                return EmployeeFactory.from_user_info_response(payload)
+
+            raise UnauthenticatedException()
+        except:
+            raise UnauthenticatedException()
 

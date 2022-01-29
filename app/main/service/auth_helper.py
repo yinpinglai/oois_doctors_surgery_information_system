@@ -76,6 +76,8 @@ class Auth:
                         'email': user.email,
                         'admin': user.admin,
                         'position': user.position,
+                        'name': user.name,
+                        'employee_number': user.employee_number,
                         'registered_on': str(user.registered_on),
                     },
                 )

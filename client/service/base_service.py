@@ -119,7 +119,7 @@ class BaseService:
 
     def __repr__(self):
         return f'''
-            BaseService: (
+            {self.__class__.__name__}: (
                 base_url: {self.base_url},
                 headers: {self.headers},
             )
