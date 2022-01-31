@@ -7,7 +7,7 @@ from app.main.model.user import User
 from app.main.model.patient import Patient
 from app.main.model.appointment import Appointment
 from app.main.enum.appointment_type import AppointmentType
-from app.main.util.response import produce_common_response_dict
+from app.main.util.response import ResponseUtil
 from typing import Dict, Tuple
 
 
@@ -16,13 +16,13 @@ def save_new_appointment(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     patient = Patient.query.filter_by(public_id=data['patient_id']).first()
 
     if not healthcare_professional:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Healthcare professional record not found. Please check.'
         )
         return response_object, 409
     elif not patient:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Patient record not found. Please create a patient record first.'
         )
@@ -45,7 +45,7 @@ def save_new_appointment(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
                 public_id=str(uuid.uuid4()),
             )
             save_changes(new_appointment)
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=True,
                 message='Successfully booked.',
                 payload={
@@ -54,7 +54,7 @@ def save_new_appointment(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             )
             return response_object, 201
         else:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Requested timeslot is not available.',
             )
@@ -65,7 +65,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
     appointment = Appointment.query.filter_by(public_id=public_id).first()
 
     if not appointment:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Appointment record not found. Please create a new record first.',
         )
@@ -74,7 +74,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         type = data['type'] if 'type' in data else appointment.type
 
         if type != AppointmentType.standard.value and type != AppointmentType.emergency.value:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message=f'Unsupported appointment type: {type} found.',
             )
@@ -84,7 +84,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         healthcare_professional = User.query.filter_by(public_id=healthcare_professional_id).first()
 
         if not healthcare_professional:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Healthcare professional record not found. Please check.',
             )
@@ -102,7 +102,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         ).first()
 
         if has_booked_appointment is not None and has_booked_appointment.public_id != appointment.public_id:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Requested timeslot is not available.',
             )
@@ -114,7 +114,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         appointment.end_time = parsed_end_time
 
         save_changes(appointment)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=True,
             message='Successfully updated.',
             payload={
@@ -126,7 +126,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
 def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
     appointment = Appointment.query.filter_by(public_id=public_id).first()
 
-    response_object = produce_common_response_dict(
+    response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully deleted.'
     )

@@ -6,7 +6,7 @@ from app.main.model.user import User
 from app.main.model.patient import Patient
 from app.main.model.prescription import Prescription
 from app.main.enum.prescription_type import PrescriptionType
-from app.main.util.response import produce_common_response_dict
+from app.main.util.response import ResponseUtil
 from typing import Dict, Tuple
 
 
@@ -15,13 +15,13 @@ def save_new_prescription(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     patient = Patient.query.filter_by(public_id=data['patient_id']).first()
 
     if not doctor:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Doctor record not found. Please check.',
         )
         return response_object, 409
     elif not patient:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Patient record not found. Please create a patient record first.',
         )
@@ -37,7 +37,7 @@ def save_new_prescription(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             created_on=datetime.datetime.utcnow(),
         )
         save_changes(new_prescription)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=True,
             message='Successfully issued.',
             payload={
@@ -51,16 +51,16 @@ def update_a_prescription(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
     prescription = Prescription.query.filter_by(public_id=public_id).first()
 
     if not prescription:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Prescription record not found. Please create a new record first.',
         )
-        return response_object, 409
+        return response_object, 404
     else:
         type = data['type'] if 'type' in data else prescription.type
 
         if type != PrescriptionType.standard.value and type != PrescriptionType.repeatable.value:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message=f'Unsupported prescription type: {type} found.'
             )
@@ -74,7 +74,7 @@ def update_a_prescription(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         prescription.dosage = dosage
 
         save_changes(prescription)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=True,
             message='Successfully updated.',
             payload={
@@ -83,12 +83,25 @@ def update_a_prescription(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         )
         return response_object, 201
 
-def get_all_prescritpions():
-    return Prescription.query.all()
+def get_all_prescritpions() -> Tuple[Dict[str, str], int]:
+    prescriptions = Prescription.query.all()
+    prescriptions = [prescription.serialize() for prescription in prescriptions]
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=prescriptions,
+    )
+    return response_object, 200
 
 
-def get_a_prescription(public_id: str):
-    return Prescription.query.filter_by(public_id=public_id).first()
+def get_a_prescription(public_id: str) -> Tuple[Dict[str, str], int]:
+    prescription = Prescription.query.filter_by(public_id=public_id).first()
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=prescription,
+    )
+    return response_object, 200
 
 
 def save_changes(data: Prescription) -> None:

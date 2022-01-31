@@ -3,7 +3,7 @@ import datetime
 
 from app.main import db
 from app.main.model.patient import Patient
-from app.main.util.response import produce_common_response_dict
+from app.main.util.response import ResponseUtil
 from typing import Dict, Tuple
 
 
@@ -18,7 +18,7 @@ def save_new_patient(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
             registered_on=datetime.datetime.utcnow(),
         )
         save_changes(new_patient)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=True,
             message='Successfully registered.',
             payload={
@@ -27,7 +27,7 @@ def save_new_patient(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         )
         return response_object, 201
     else:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Patient already exists.',
         )

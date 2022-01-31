@@ -3,7 +3,7 @@ import datetime
 
 from app.main import db
 from app.main.model.user import User
-from app.main.util.response import produce_common_response_dict
+from app.main.util.response import ResponseUtil
 from typing import Dict, Tuple
 
 
@@ -22,7 +22,7 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         save_changes(new_user)
         return generate_token(new_user)
     else:
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='User already exists. Please Log in.',
         )
@@ -41,7 +41,7 @@ def generate_token(user: User) -> Tuple[Dict[str, str], int]:
     try:
         # generate the auth token
         auth_token = User.encode_auth_token(user.id)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=True,
             message='Successfully registered.',
             payload={
@@ -52,7 +52,7 @@ def generate_token(user: User) -> Tuple[Dict[str, str], int]:
         return response_object, 201
     except Exception as e:
         print(e)
-        response_object = produce_common_response_dict(
+        response_object = ResponseUtil.produce_common_response_dict(
             is_success=False,
             message='Some error occurred. Please try again.',
         )

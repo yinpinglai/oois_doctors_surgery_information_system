@@ -1,6 +1,6 @@
 from app.main.model.user import User
+from app.main.util.response import ResponseUtil
 from ..service.blacklist_service import save_token
-from ..util.response import produce_common_response_dict
 from typing import Dict, Tuple
 
 
@@ -14,7 +14,7 @@ class Auth:
             if user and user.check_password(data.get('password')):
                 auth_token = User.encode_auth_token(user.id)
                 if auth_token:
-                    response_object = produce_common_response_dict(
+                    response_object = ResponseUtil.produce_common_response_dict(
                         is_success=True,
                         message='Successfully logged in.',
                         payload={
@@ -23,7 +23,7 @@ class Auth:
                     )
                     return response_object, 200
             else:
-                response_object = produce_common_response_dict(
+                response_object = ResponseUtil.produce_common_response_dict(
                     is_success=False,
                     message='email or password does not match.',
                 )
@@ -31,7 +31,7 @@ class Auth:
 
         except Exception as e:
             print(e)
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Try again',
             )
@@ -49,13 +49,13 @@ class Auth:
                 # mark the token as blacklisted
                 return save_token(token=auth_token)
             else:
-                response_object = produce_common_response_dict(
+                response_object = ResponseUtil.produce_common_response_dict(
                     is_success=False,
                     message=resp,
                 )
                 return response_object, 401
         else:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Provide a valid auth token.',
             )
@@ -69,7 +69,7 @@ class Auth:
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 user = User.query.filter_by(id=resp).first()
-                response_object = produce_common_response_dict(
+                response_object = ResponseUtil.produce_common_response_dict(
                     is_success=True,
                     payload={
                         'user_id': user.id,
@@ -82,13 +82,13 @@ class Auth:
                     },
                 )
                 return response_object, 200
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message=resp,
             )
             return response_object, 401
         else:
-            response_object = produce_common_response_dict(
+            response_object = ResponseUtil.produce_common_response_dict(
                 is_success=False,
                 message='Provide a valid auth token.',
             )
