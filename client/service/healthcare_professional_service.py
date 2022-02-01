@@ -66,7 +66,7 @@ class HealthcareProfessionalService(BaseService):
                 raise ApiCallException(message)
 
         except Exception as e:
-            print(f'{self.__class__.__name__} - get_health_professional_list - captured an exception:')
+            print(f'{self.__class__.__name__} - get_healthcare_professional - captured an exception:')
             print(e)
             raise e
 

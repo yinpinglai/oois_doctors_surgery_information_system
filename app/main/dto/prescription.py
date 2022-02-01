@@ -11,6 +11,7 @@ class PrescriptionDto:
         'quantity': fields.Integer(required=True, description='prescription quantity'),
         'dosage': fields.String(required=True, description='prescription dosage'),
         'public_id': fields.String(description='prescription Identifier'),
+        'created_on': fields.DateTime(description='prescription created time'),
     })
     prescription_details = api.model('prescription_details', {
         'type': fields.String(description='prescription type'),

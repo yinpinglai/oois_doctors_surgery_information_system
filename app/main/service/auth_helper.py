@@ -73,6 +73,7 @@ class Auth:
                     is_success=True,
                     message='Successfully fetched.',
                     payload={
+                        'public_id': user.public_id,
                         'user_id': user.id,
                         'email': user.email,
                         'admin': user.admin,

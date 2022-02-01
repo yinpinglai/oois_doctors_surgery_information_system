@@ -15,10 +15,8 @@ class BaseService:
         for key in headers:
             self.headers[key] = headers[key]
 
-
     def fetch_request_url(self, resource_url: str) -> str:
         return f'{self.base_url}/{resource_url}'
-
 
     def fetch_request_headers(self, headers: Dict = {'Content-Type': 'application/json'}) -> Dict:
         request_headers = {}
@@ -28,11 +26,9 @@ class BaseService:
             request_headers[key] = headers[key]
         return request_headers
 
-
     def set_headers(self, headers: Dict = {}) -> None:
         for key in headers:
             self.headers[key] = headers[key]
-
 
     def print_request_debug_log_messages(self, resource_url: str, headers: Dict = {}, params: Dict = {}, payload: Dict = {}) -> None:
         request_url = self.fetch_request_url(resource_url)
@@ -49,7 +45,6 @@ class BaseService:
             '''
         )
 
-
     def print_response_debug_log_messages(self, resource_url: str, response: Any) -> None:
         request_url = self.fetch_request_url(resource_url)
         print(
@@ -63,7 +58,6 @@ class BaseService:
                 -------- Http Response --------
             '''
         )
-
 
     def handle_response(self, response: Any) -> None:
         status_code = response.status_code
@@ -124,7 +118,28 @@ class BaseService:
 
 
     def put(self, resource_url: str, payload: Dict = {}) -> Tuple[int, Dict]:
-        pass
+        request_headers = self.fetch_request_headers()
+        request_url = self.fetch_request_url(resource_url)
+
+        self.print_request_debug_log_messages(
+            resource_url,
+            headers=request_headers,
+            payload=payload,
+        )
+        try:
+            response = requests.put(
+                request_url,
+                data=json.dumps(payload) if payload != False else payload,
+                headers=request_headers,
+            )
+            self.print_response_debug_log_messages(
+                resource_url,
+                response,
+            )
+            self.handle_response(response)
+            return response.status_code, response.json()
+        except Exception as e:
+            raise e
 
 
     def delete(self, resource_url: str, payload: Dict = {}) -> Tuple[int, Dict]:

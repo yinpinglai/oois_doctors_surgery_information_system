@@ -1,4 +1,5 @@
 from typing import List
+from .prescription import Prescription
 
 class Patient:
 
@@ -47,9 +48,17 @@ class Patient:
     def appointments(self) -> List:
         return self._appointments
 
+    @appointments.setter
+    def appointments(self, new_appointments) -> None:
+        self._appointments = new_appointments
+
     @property
     def prescriptions(self) -> List:
         return self._prescriptions
+
+    @prescriptions.setter
+    def prescriptions(self, new_prescriptions: List[Prescription]) -> None:
+        self._prescriptions = new_prescriptions
 
     def __str__(self):
         return f'<Patient: {self.name}>'
