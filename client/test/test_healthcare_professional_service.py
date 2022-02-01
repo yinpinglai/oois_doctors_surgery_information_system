@@ -35,7 +35,6 @@ class TestHealthcareProfessionalService(unittest.TestCase):
             cls.token = ''
             cls.headers = {}
 
-
     def test_get_healthcare_professional_list(self):
         assert self.token is not None
 

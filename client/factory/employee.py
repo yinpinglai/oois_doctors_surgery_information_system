@@ -11,8 +11,9 @@ class EmployeeFactory:
     @staticmethod
     def from_user_api_response(payload: Dict[str, Any]) -> Employee:
         '''
-        Produce an employee instance from the user API response
+        Produces an employee instance from the user API response
 
+        :param payload - The payload from the API response
         :return employee - An employee instance
         '''
         public_id = payload['public_id'] or ''
@@ -40,6 +41,7 @@ class EmployeeFactory:
         '''
         Produces a list of employee instance from the user list API response
 
+        :param payload - The payload from the API response
         :return employee_list - The list of employee instance
         '''
         employee_list = []
