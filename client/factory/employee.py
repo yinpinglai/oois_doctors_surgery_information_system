@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import List, Dict, Any
 from client.enum.position_type import PositionType
 from client.model.employee import Employee
 from client.model.nurse import Nurse
@@ -9,10 +9,13 @@ from client.model.receptionist import Receptionist
 class EmployeeFactory:
 
     @staticmethod
-    def from_user_info_response(payload: Dict[str, str]) -> Employee:
+    def from_user_api_response(payload: Dict[str, Any]) -> Employee:
         '''
-        Produce an employee instance from the user info API response
+        Produce an employee instance from the user API response
+
+        :return employee - An employee instance
         '''
+        public_id = payload['public_id'] or ''
         name = payload['name'] or ''
         employee_number = payload['employee_number'] or ''
         position = payload['position'] or PositionType.staff.value
@@ -27,7 +30,23 @@ class EmployeeFactory:
         else:
             employee = Employee()
 
+        employee.public_id = public_id
         employee.name = name
         employee.employee_number = employee_number
         return employee
+
+    @staticmethod
+    def from_user_list_api_response(payload: List[Dict[str, Any]]) -> List[Employee]:
+        '''
+        Produces a list of employee instance from the user list API response
+
+        :return employee_list - The list of employee instance
+        '''
+        employee_list = []
+
+        for data in payload:
+            employee = EmployeeFactory.from_user_api_response(data)
+            employee_list.append(employee)
+
+        return employee_list
 

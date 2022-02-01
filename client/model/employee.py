@@ -4,10 +4,18 @@ from client.enum.position_type import PositionType
 class Employee:
 
     def __init__(self) -> None:
+        self._public_id = ''
         self._name = ''
         self._position = PositionType.staff.value
         self._employee_number = ''
 
+    @property
+    def public_id(self) -> str:
+        return self._public_id
+
+    @public_id.setter
+    def public_id(self, new_public_id: str) -> None:
+        self._public_id = new_public_id
 
     @property
     def name(self) -> str:
@@ -39,6 +47,7 @@ class Employee:
     def __repr__(self):
         return f'''
             {self.__class__.__name__}: (
+                public_id: {self.public_id},
                 name: {self.name},
                 employee_number: {self.employee_number},
             )

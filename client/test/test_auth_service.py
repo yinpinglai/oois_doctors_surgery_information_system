@@ -5,11 +5,13 @@ from client.service.auth_service import AuthService
 
 class TestAuthService(unittest.TestCase):
 
-    def test_login(self):
+    def __init__(self, methodName: str = ...) -> None:
+        super().__init__(methodName)
         config = config_by_name['test']
-        auth_service = AuthService(config)
+        self.auth_service = AuthService(config)
 
-        is_success, token = auth_service.login(
+    def test_login(self):
+        is_success, token = self.auth_service.login(
             email='kris.lai@gmail.com',
             password='P@ssw0rd',
         )
@@ -20,10 +22,7 @@ class TestAuthService(unittest.TestCase):
 
 
     def test_logout(self):
-        config = config_by_name['test']
-        auth_service = AuthService(config)
-
-        is_success, token = auth_service.login(
+        is_success, token = self.auth_service.login(
             email='kris.lai@gmail.com',
             password='P@ssw0rd',
         )
@@ -31,15 +30,12 @@ class TestAuthService(unittest.TestCase):
         assert token is not None
         assert len(token) > 0
 
-        is_success = auth_service.logout(token)
+        is_success = self.auth_service.logout(token)
         assert is_success == True
 
 
     def test_user_info(self):
-        config = config_by_name['test']
-        auth_service = AuthService(config)
-
-        is_success, token = auth_service.login(
+        is_success, token = self.auth_service.login(
             email='kris.lai@gmail.com',
             password='P@ssw0rd',
         )
@@ -47,7 +43,7 @@ class TestAuthService(unittest.TestCase):
         assert token is not None
         assert len(token) > 0
 
-        employee = auth_service.user_info(token)
+        employee = self.auth_service.get_user_info(token)
         assert employee is not None
         assert employee.name == 'Kris, Lai'
         assert employee.employee_number == 'sf001'

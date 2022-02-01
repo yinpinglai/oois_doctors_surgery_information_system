@@ -15,7 +15,7 @@ class UserLogin(Resource):
     """
     User Login Resource
     """
-    @api.doc('user login')
+    @api.doc('Logins a user')
     @api.expect(user_auth, validate=True)
     def post(self) -> Tuple[Dict[str, str], int]:
         post_data = request.json
@@ -27,19 +27,19 @@ class LogoutAPI(Resource):
     """
     Logout Resource
     """
-    @api.doc('logout a user')
+    @api.doc('Logouts a user')
     def post(self) -> Tuple[Dict[str, str], int]:
         auth_header = request.headers.get('Authorization')
         return Auth.logout_user(data=auth_header)
 
 
-@api.route('/user/info')
+@api.route('/user-info')
 class UserInfoAPI(Resource):
     """
     User Information Resource
     """
     @token_required
-    @api.doc('user info')
+    @api.doc('Gets logged in user infomation')
     def post(self) -> Tuple[Dict[str, str], int]:
         return Auth.get_logged_in_user(request)
 

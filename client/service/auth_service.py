@@ -1,10 +1,10 @@
 from typing import Dict, Tuple
+
 from ..config import Config
 from .base_service import BaseService
 from client.model.employee import Employee
-from client.enum.position_type import PositionType
 from client.factory.employee import EmployeeFactory
-from client.exception.unauthenticated_exception import UnauthenticatedException
+from client.exception.api_call_exception import ApiCallException
 
 class AuthService(BaseService):
 
@@ -53,12 +53,13 @@ class AuthService(BaseService):
             return False
 
 
-    def user_info(self, token: str) -> Employee:
+    def get_user_info(self, token: str) -> Employee or None:
         '''
-        Get logged in user info from the system
+        Gets logged in user info from the system
 
         :param token - the access token
         :return employee - an employee instance
+        :throws UnauthenticatedException | ApiCallException | Exception
         '''
         resource_url = self.config.AUTH_API_USER_INFO_URL
         try:
@@ -67,12 +68,16 @@ class AuthService(BaseService):
             })
             status_code, data = self.post(resource_url)
             is_success = data['is_success']
+            message = data['message']
 
             if status_code == 200 and is_success:
                 payload = data['payload']
-                return EmployeeFactory.from_user_info_response(payload)
+                return EmployeeFactory.from_user_api_response(payload)
+            else:
+                raise ApiCallException(message)
 
-            raise UnauthenticatedException()
-        except:
-            raise UnauthenticatedException()
+        except Exception as e:
+            print(f'{self.__class__.__name__} - get_user_info - captured an exception:')
+            print(e)
+            raise e
 

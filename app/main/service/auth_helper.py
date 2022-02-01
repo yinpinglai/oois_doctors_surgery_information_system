@@ -71,6 +71,7 @@ class Auth:
                 user = User.query.filter_by(id=resp).first()
                 response_object = ResponseUtil.produce_common_response_dict(
                     is_success=True,
+                    message='Successfully fetched.',
                     payload={
                         'user_id': user.id,
                         'email': user.email,

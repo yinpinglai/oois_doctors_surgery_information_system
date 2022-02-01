@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource
+from flask_restx import Resource, reqparse
 
 from app.main.dto.user import UserDto
 from app.main.util.decorator import token_required, admin_token_required
@@ -21,7 +21,10 @@ class UserList(Resource):
     @api.marshal_list_with(_user_list_api)
     def get(self):
         """List all registered users"""
-        return get_all_users()
+        parser = reqparse.RequestParser()
+        parser.add_argument('position', action='append', help='User\'s position.')
+        params = parser.parse_args()
+        return get_all_users(params)
 
     @admin_token_required
     @api.expect(_user, validate=True)

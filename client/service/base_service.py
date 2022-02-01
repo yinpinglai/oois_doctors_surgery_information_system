@@ -2,6 +2,8 @@ import json
 import requests
 
 from typing import Dict, Tuple, Any
+from client.exception.api_call_exception import ApiCallException
+from client.exception.unauthenticated_exception import UnauthenticatedException
 from ..config import Config
 
 class BaseService:
@@ -18,11 +20,12 @@ class BaseService:
         return f'{self.base_url}/{resource_url}'
 
 
-    def fetch_request_headers(self, content_type: str = 'application/json') -> Dict:
+    def fetch_request_headers(self, headers: Dict = {'Content-Type': 'application/json'}) -> Dict:
         request_headers = {}
         for key in self.headers:
             request_headers[key] = self.headers[key]
-        request_headers['Content-Type'] = content_type
+        for key in headers:
+            request_headers[key] = headers[key]
         return request_headers
 
 
@@ -31,7 +34,7 @@ class BaseService:
             self.headers[key] = headers[key]
 
 
-    def print_request_debug_log_messages(self, resource_url: str, headers: Dict = {}, payload: Dict = {}) -> None:
+    def print_request_debug_log_messages(self, resource_url: str, headers: Dict = {}, params: Dict = {}, payload: Dict = {}) -> None:
         request_url = self.fetch_request_url(resource_url)
         print(
             f'''
@@ -39,6 +42,7 @@ class BaseService:
                 {self.__class__.__name__}: (
                     request_url: {request_url},
                     headers: {headers},
+                    params: {params},
                     payload: {payload},
                 )
                 -------- Http Request --------
@@ -61,13 +65,22 @@ class BaseService:
         )
 
 
-    def get(self, resource_url: str, params: Dict = {}) -> Tuple[int, Any]:
-        request_headers = self.fetch_request_headers()
+    def handle_response(self, response: Any) -> None:
+        status_code = response.status_code
+
+        if status_code == 403:
+            raise UnauthenticatedException()
+        elif status_code < 200 or status_code >= 300:
+            raise ApiCallException(response.text)
+
+    def get(self, resource_url: str, headers: Dict = {}, params: Dict = {}) -> Tuple[int, Any]:
+        request_headers = self.fetch_request_headers(headers)
         request_url = self.fetch_request_url(resource_url)
 
         self.print_request_debug_log_messages(
             resource_url,
-            params,
+            headers=request_headers,
+            params=params,
         )
         try:
             response = requests.get(
@@ -79,9 +92,10 @@ class BaseService:
                 resource_url,
                 response,
             )
+            self.handle_response(response)
             return response.status_code, response.json()
-        except:
-            raise Exception('Unable to perform the get request')
+        except Exception as e:
+            raise e
 
 
     def post(self, resource_url: str, payload: Dict = {}) -> Tuple[int, Dict]:
@@ -90,8 +104,8 @@ class BaseService:
 
         self.print_request_debug_log_messages(
             resource_url,
-            request_headers,
-            payload,
+            headers=request_headers,
+            payload=payload,
         )
         try:
             response = requests.post(
@@ -103,10 +117,10 @@ class BaseService:
                 resource_url,
                 response,
             )
+            self.handle_response(response)
             return response.status_code, response.json()
         except Exception as e:
-            print(e)
-            raise Exception('Unable to perform the post request')
+            raise e
 
 
     def put(self, resource_url: str, payload: Dict = {}) -> Tuple[int, Dict]:

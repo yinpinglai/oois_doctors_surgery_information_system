@@ -14,9 +14,24 @@ class Config:
 
     # API config
     API_PREFIX = 'api'
+
+    # Auth API
     AUTH_API_LOGIN_RESOURCE_URL = 'auth/login'
     AUTH_API_LOGOUT_RESOURCE_URL = 'auth/logout'
-    AUTH_API_USER_INFO_URL = 'auth/user/info'
+    AUTH_API_USER_INFO_URL = 'auth/user-info'
+
+    # Patient API
+    PATIENT_API_GET_PATIENT_LIST_RESOURCE_URL = 'patient'
+    PATIENT_API_GET_PATIENT_RESOURCE_URL = 'patient'
+    PATIENT_API_CREATE_OR_UPDATE_PATIENT_RESOURCE_URL = 'patient'
+
+    # Healthcare Professional API
+    HEALTHCARE_PROFESSIONAL_API_GET_HEALTHCARE_PROFESSIONAL_LIST_RESOURCE_URL = 'user/'
+    HEALTHCARE_PROFESSIONAL_API_GET_HEALTHCARE_PROFESSIONAL_RESOURCE_URL = 'user'
+
+    # Appointment API
+    APPOINTMENT_API_GET_NEXT_AVAILABLE_TIMESLOT_RESOURCE_URL = 'appointment'
+
 
 
 class DevelopmentConfig(Config):
