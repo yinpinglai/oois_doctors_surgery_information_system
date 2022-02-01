@@ -8,21 +8,31 @@ from typing import Dict, Tuple
 
 api = UserDto.api
 _user = UserDto.user
+_user_list_api = UserDto.user_list_api
+_user_details_api = UserDto.user_details_api
+_user_changed_response = UserDto.user_changed_response
 
 
 @api.route('/')
 class UserList(Resource):
 
     @admin_token_required
-    @api.doc('list_of_registered_users')
-    @api.marshal_list_with(_user, envelope='data')
+    @api.doc('Gets the list of user')
+    @api.marshal_list_with(_user_list_api)
     def get(self):
         """List all registered users"""
         return get_all_users()
 
+    @admin_token_required
     @api.expect(_user, validate=True)
-    @api.response(201, 'User successfully created.')
-    @api.doc('create a new user')
+    @api.response(201, 'User successfully created.', _user_changed_response)
+    @api.doc(
+        'Creates a new user',
+        responses={
+            401: 'Some error occurred. Please try again.',
+            409: 'User already exists. Please Log in.',
+        },
+    )
     def post(self) -> Tuple[Dict[str, str], int]:
         """Creates a new User """
         data = request.json
@@ -35,8 +45,8 @@ class UserList(Resource):
 class User(Resource):
 
     @token_required
-    @api.doc('get a user')
-    @api.marshal_with(_user)
+    @api.doc('Gets an user')
+    @api.marshal_with(_user_details_api)
     def get(self, public_id):
         """Gets a user given its identifier"""
         user = get_a_user(public_id)

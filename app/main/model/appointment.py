@@ -1,8 +1,11 @@
-from .. import db
 from sqlalchemy.sql import func
+from .. import db
+from .json_serializable import JSONSerializable
+from app.main.util.datetime import DateTimeUtil
 from app.main.enum.appointment_type import AppointmentType
 
 
+@JSONSerializable.register
 class Appointment(db.Model):
     ''' Appointment Model for storing appointment related details '''
     __tablename__ = 'appointment'
@@ -15,6 +18,23 @@ class Appointment(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     booked_on = db.Column(db.DateTime, nullable=False, default=func.now())
     public_id = db.Column(db.String(100), unique=True)
+
+    def serialize(self):
+        '''
+        Serializes the object instance to the JSON standard format
+
+        :return serialized_dictionary - The serialized JSON dictionary
+        '''
+        return {
+            'id': self.id,
+            'type': self.type,
+            'healthcare_professional_id': self.healthcare_professional_id,
+            'patient_id': self.patient_id,
+            'start_time': DateTimeUtil.serialize_datetime_object(self.start_time),
+            'end_time': DateTimeUtil.serialize_datetime_object(self.end_time),
+            'booked_on': DateTimeUtil.serialize_datetime_object(self.booked_on),
+            'public_id': self.public_id,
+        }
 
     def __str__(self):
         return f"<Appointment starts at '{self.start_time}' and ends at '{self.end_time}'>"

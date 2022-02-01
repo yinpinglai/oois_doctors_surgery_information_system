@@ -30,11 +30,27 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
 
 
 def get_all_users():
-    return User.query.all()
+    users = ResponseUtil.convert_to_json_serializable(
+        ResponseUtil.convert_to_json_serializable(User.query.all())
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=users,
+    )
+    return response_object, 200
 
 
 def get_a_user(public_id: str):
-    return User.query.filter_by(public_id=public_id).first()
+    user = ResponseUtil.convert_to_json_serializable(
+        User.query.filter_by(public_id=public_id).first()
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=user,
+    )
+    return response_object, 200
 
 
 def generate_token(user: User) -> Tuple[Dict[str, str], int]:

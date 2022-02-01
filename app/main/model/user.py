@@ -1,14 +1,18 @@
 
-from .. import db, flask_bcrypt
-import datetime
-from app.main.model.blacklist import BlacklistToken
-from app.main.enum.position_type import PositionType
-from ..config import key
 import jwt
-from typing import Union
+import datetime
+from typing import Union, Dict, Any
 from sqlalchemy.sql import func
 
+from .. import db, flask_bcrypt
+from ..config import key
+from .json_serializable import JSONSerializable
+from app.main.util.datetime import DateTimeUtil
+from app.main.model.blacklist import BlacklistToken
+from app.main.enum.position_type import PositionType
 
+
+@JSONSerializable.register
 class User(db.Model):
     ''' User Model for storing user related details '''
     __tablename__ = 'user'
@@ -73,6 +77,24 @@ class User(db.Model):
             return 'Signature expired. Please log in again.'
         except jwt.InvalidTokenError:
             return 'Invalid token. Please log in again.'
+
+    def serialize(self) -> Dict[str, Any]:
+        '''
+        Serializes the object instance to the JSON standard format
+
+        :return serialized_dictionary - The serialized JSON dictionary
+        '''
+        return {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'employee_number': self.employee_number,
+            'position': self.position,
+            'admin': self.admin,
+            'appointments': self.appointments,
+            'registered_on': DateTimeUtil.serialize_datetime_object(self.registered_on),
+            'public_id': self.public_id,
+        }
 
     def __str__(self):
         return f"<User '{self.name}' and user's position is {self.position}>"

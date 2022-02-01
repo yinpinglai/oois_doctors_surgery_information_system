@@ -84,8 +84,9 @@ def update_a_prescription(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         return response_object, 201
 
 def get_all_prescritpions() -> Tuple[Dict[str, str], int]:
-    prescriptions = Prescription.query.all()
-    prescriptions = [prescription.serialize() for prescription in prescriptions]
+    prescriptions = ResponseUtil.convert_to_json_serializable(
+        Prescription.query.all()
+    )
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully fetched.',
@@ -95,7 +96,9 @@ def get_all_prescritpions() -> Tuple[Dict[str, str], int]:
 
 
 def get_a_prescription(public_id: str) -> Tuple[Dict[str, str], int]:
-    prescription = Prescription.query.filter_by(public_id=public_id).first()
+    prescription = ResponseUtil.convert_to_json_serializable(
+        Prescription.query.filter_by(public_id=public_id).first()
+    )
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully fetched.',

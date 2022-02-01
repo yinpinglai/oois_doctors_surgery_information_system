@@ -128,7 +128,10 @@ def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
 
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
-        message='Successfully deleted.'
+        message='Successfully deleted.',
+        payload={
+            'id': public_id,
+        },
     )
     if not appointment:
         return response_object, 200
@@ -139,11 +142,27 @@ def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
 
 
 def get_all_appointments():
-    return Appointment.query.all()
+    appointments = ResponseUtil.convert_to_json_serializable(
+        Appointment.query.all()
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=appointments,
+    )
+    return response_object, 200
 
 
 def get_an_appointment(public_id: str):
-    return Appointment.query.filter_by(public_id=public_id).first()
+    appointment = ResponseUtil.convert_to_json_serializable(
+        Appointment.query.filter_by(public_id=public_id).first()
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=appointment,
+    )
+    return response_object, 200
 
 
 def save_changes(data: Appointment) -> None:

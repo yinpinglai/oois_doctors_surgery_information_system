@@ -9,22 +9,31 @@ from typing import Dict, Tuple
 api = AppointmentDto.api
 _appointment = AppointmentDto.appointment
 _appointment_details = AppointmentDto.appointment_details
+_appointment_list_api = AppointmentDto.appointment_list_api
+_appointment_details_api = AppointmentDto.appointment_details_api
+_appointment_changed_response = AppointmentDto.appointment_changed_response
 
 
 @api.route('/')
 class AppointmentList(Resource):
 
     @token_required
-    @api.doc('list_of_booked_appointments')
-    @api.marshal_list_with(_appointment, envelope='data')
+    @api.doc('Gets the list of appointments')
+    @api.marshal_list_with(_appointment_list_api)
     def get(self):
         ''' List all booked appointments '''
         return get_all_appointments()
 
     @receptionist_token_required
     @api.expect(_appointment, validate=True)
-    @api.response(201, 'Appointment successfully booked.')
-    @api.doc('book a new appointment')
+    @api.response(201, 'Appointment successfully booked.', _appointment_changed_response)
+    @api.doc(
+        'Books a new appointment',
+        responses={
+            409: 'Request contains a conflit and cannot be accepted.',
+
+        },
+    )
     def post(self) -> Tuple[Dict[str, str], int]:
         ''' Books a new appointment '''
         data = request.json
@@ -37,8 +46,8 @@ class AppointmentList(Resource):
 class Appointment(Resource):
 
     @token_required
-    @api.doc('get an appointment')
-    @api.marshal_with(_appointment_details)
+    @api.doc('Gets an appointment')
+    @api.marshal_with(_appointment_details_api)
     def get(self, public_id):
         ''' Gets an appointment given its identifier '''
         appointment = get_an_appointment(public_id)
@@ -49,14 +58,21 @@ class Appointment(Resource):
 
     @receptionist_token_required
     @api.expect(_appointment_details, validate=True)
-    @api.doc('update an appointment')
+    @api.response(201, 'Appointment successfully updated.', _appointment_changed_response)
+    @api.doc(
+        'Updates an appointment',
+        responses={
+            409: 'Request contains a conflit and cannot be accepted.',
+        },
+    )
     def put(self, public_id):
         ''' Updates an appointment given its identifier '''
         data = request.json
         return update_an_appointment(public_id, data)
 
     @receptionist_token_required
-    @api.doc('delete an appointment')
+    @api.response(200, 'Appointment record successfully deleted.', _appointment_changed_response)
+    @api.doc('Deletes an appointment')
     def delete(self, public_id):
         ''' Deletes an appointment given its identifier '''
         return delete_an_appointment(public_id)

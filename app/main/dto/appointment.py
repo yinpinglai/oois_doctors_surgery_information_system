@@ -1,4 +1,5 @@
 from flask_restx import Namespace, fields
+from .api import produce_api_response_structure
 
 
 class AppointmentDto:
@@ -17,4 +18,16 @@ class AppointmentDto:
 		'start_time': fields.DateTime(required=True, description='appointment start time'),
 		'end_time': fields.DateTime(required=True, description='appointment end time'),
     })
+    appointment_list_api = api.model('appointment_list_api', produce_api_response_structure(
+        appointment,
+        is_list=True,
+    ))
+    appointment_details_api = api.model('appointment_details_api', produce_api_response_structure(
+        appointment,
+    ))
+    appointment_changed_response = api.model('appointment_changed_response', produce_api_response_structure(
+        api.model('appointment_successfully_changed_response', {
+           'id': fields.String(description='appointment Identifier'),
+        }),
+    ))
 

@@ -18,7 +18,7 @@ _prescription_changed_response = PrescriptionDto.prescription_changed_response
 class PrescriptionList(Resource):
 
     @token_required
-    @api.doc('list_of_issued_prescriptions')
+    @api.doc('Gets the list of prescription')
     @api.marshal_list_with(_prescription_list_api)
     def get(self):
         ''' List all issued prescriptions '''
@@ -32,7 +32,7 @@ class PrescriptionList(Resource):
         responses={
             404: 'Prescription record not found. Please create a new record first.',
             409: 'Unsupported prescription type: {type} found.'
-        }
+        },
     )
     def post(self) -> Tuple[Dict[str, str], int]:
         ''' Issues a new prescription by a doctor for a patient '''
@@ -46,7 +46,7 @@ class PrescriptionList(Resource):
 class Prescription(Resource):
 
     @token_required
-    @api.doc('get a prescription')
+    @api.doc('Gets a prescription')
     @api.marshal_with(_prescription_details_api)
     def get(self, public_id):
         ''' Gets a prescription given its identifier '''

@@ -35,11 +35,27 @@ def save_new_patient(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
 
 
 def get_all_patients():
-    return Patient.query.all()
+    patients = ResponseUtil.convert_to_json_serializable(
+        Patient.query.all()
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=patients,
+    )
+    return response_object, 200
 
 
 def get_a_patient(public_id: str):
-    return Patient.query.filter_by(public_id=public_id).first()
+    patient = ResponseUtil.convert_to_json_serializable(
+        Patient.query.filter_by(public_id=public_id).first()
+    )
+    response_object = ResponseUtil.produce_common_response_dict(
+        is_success=True,
+        message='Successfully fetched.',
+        payload=patient,
+    )
+    return response_object, 200
 
 
 def save_changes(data: Patient) -> None:

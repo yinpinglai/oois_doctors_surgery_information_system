@@ -8,22 +8,30 @@ from typing import Dict, Tuple
 
 api = PatientDto.api
 _patient = PatientDto.patient
+_patient_list_api = PatientDto.patient_list_api
+_patient_details_api = PatientDto.patient_details_api
+_patient_changed_response = PatientDto.patient_changed_response
 
 
 @api.route('/')
 class PatientList(Resource):
 
     @token_required
-    @api.doc('list_of_registered_patients')
-    @api.marshal_list_with(_patient, envelope='data')
+    @api.doc('Gets the list of patients')
+    @api.marshal_list_with(_patient_list_api)
     def get(self):
         ''' List all registered patients'''
         return get_all_patients()
 
     @receptionist_token_required
     @api.expect(_patient, validate=True)
-    @api.response(201, 'Patient successfully created.')
-    @api.doc('create a new patient')
+    @api.response(201, 'Patient successfully created.', _patient_changed_response)
+    @api.doc(
+        'Creates a new patient',
+        responses={
+            409: 'Patient already exists.',
+        },
+    )
     def post(self) -> Tuple[Dict[str, str], int]:
         ''' Creates a new patient '''
         data = request.json
@@ -35,8 +43,8 @@ class PatientList(Resource):
 @api.response(404, 'Patient not found.')
 class Patient(Resource):
     @token_required
-    @api.doc('get a patient')
-    @api.marshal_with(_patient)
+    @api.doc('Gets a patient')
+    @api.marshal_with(_patient_details_api)
     def get(self, public_id):
         ''' Get a patient given its identifier '''
         patient = get_a_patient(public_id)
