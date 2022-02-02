@@ -4,6 +4,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+    PORT = 5050
+    SECRET_KEY = 'thisisthesecretkey'
+
     API_HOST = os.getenv('API_HOST', 'http://127.0.0.1')
     API_PORT = os.getenv('API_PORT', '5000')
 

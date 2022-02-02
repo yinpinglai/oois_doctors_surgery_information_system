@@ -8,6 +8,7 @@ from app import blueprint
 from app.main import create_app, db
 
 from client import start_client_app
+from client.config import config_by_name
 
 
 config_name = os.getenv('APP_ENVIRONMENT') or 'dev'
@@ -30,7 +31,9 @@ def run_server():
 
 @manager.command
 def run_client():
-    start_client_app(config_name)
+    client_app_port = config_by_name[config_name].PORT
+    app = start_client_app(config_name)
+    app.run(port=client_app_port, debug=True)
 
 
 @manager.command

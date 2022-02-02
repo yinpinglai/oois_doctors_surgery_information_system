@@ -72,7 +72,13 @@ class AuthService(BaseService):
 
             if status_code == 200 and is_success:
                 payload = data['payload']
-                return EmployeeFactory.from_user_api_response(payload)
+                employee = EmployeeFactory.from_user_api_response(payload)
+
+                employee.is_authenticated = True
+                employee.is_active = True
+                employee.access_token = token
+
+                return employee
             else:
                 raise ApiCallException(message)
 

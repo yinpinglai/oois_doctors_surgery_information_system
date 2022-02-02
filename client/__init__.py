@@ -1,22 +1,30 @@
-import sys
+from flask import Flask
+from flask_login import LoginManager
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton, QVBoxLayout
-
-from .config import config_by_name, Config
-
-class ClientApp(QMainWindow):
-
-    def __init__(self, config: Config):
-        super().__init__()
-
-        self.setWindowTitle(config.TITLE)
-        self.setFixedSize(QSize(config.WIDTH, config.HEIGHT))
+from client.service.auth_service import AuthService
+from .views import create_blueprint as create_views_blueprint
+from .auth import create_blueprint as create_auth_blueprint
+from .config import config_by_name
 
 
 def start_client_app(config_name: str) -> None:
-    app = QApplication([])
-    window = ClientApp(config_by_name[config_name])
-    window.show()
-    sys.exit(app.exec_())
+    config = config_by_name[config_name]
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = config.SECRET_KEY
+
+    app.register_blueprint(create_views_blueprint(config), url_prefix='/')
+    app.register_blueprint(create_auth_blueprint(config), url_prefix='/')
+
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.init_app(app)
+
+    auth_service = AuthService(config)
+
+    @login_manager.user_loader
+    def load_user(token):
+        employee = auth_service.get_user_info(token)
+        return employee
+
+    return app
 

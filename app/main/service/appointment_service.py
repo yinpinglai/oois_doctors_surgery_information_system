@@ -2,13 +2,14 @@ import uuid
 import datetime
 from dateutil import parser
 
+from typing import Dict, Tuple
 from app.main import db
 from app.main.model.user import User
 from app.main.model.patient import Patient
 from app.main.model.appointment import Appointment
 from app.main.enum.appointment_type import AppointmentType
 from app.main.util.response import ResponseUtil
-from typing import Dict, Tuple
+from app.main.util.datetime import DateTimeUtil
 
 
 def save_new_appointment(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
@@ -142,23 +143,32 @@ def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
 
 
 def get_all_appointments(params: Dict[str, str]) -> Tuple[Dict[str, str], int]:
-    appointments_data = None
+    appointments_query = Appointment.query
+
+    if params and params['start_time'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.start_time >= DateTimeUtil.from_iso_datetime_string(params['start_time'])
+        )
+
+    if params and params['end_time'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.end_time <= DateTimeUtil.from_iso_datetime_string(params['end_time'])
+        )
 
     if params and params['sort_by'] is not None and params['sort_by'] == 'start_time':
         sort_order = params['sort_order'] or 'asc'
         if sort_order == 'desc':
-            appointments_data = Appointment.query.order_by(
+            appointments_query = appointments_query.order_by(
                 Appointment.start_time.desc()
             )
         else:
-            appointments_data = Appointment.query.order_by(
+            appointments_query = appointments_query.order_by(
                 Appointment.start_time.asc()
             )
 
-    if appointments_data is None:
-        appointments_data = Appointment.query.all()
-
-    appointments = ResponseUtil.convert_to_json_serializable(appointments_data)
+    appointments = ResponseUtil.convert_to_json_serializable(
+        appointments_query.all()
+    )
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully fetched.',
