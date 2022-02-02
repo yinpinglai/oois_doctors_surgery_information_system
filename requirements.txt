@@ -11,6 +11,7 @@ eventlet==0.31.0
 Flask==1.1.4
 Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.9
+Flask-Login==0.5.0
 Flask-Migrate==2.1.1
 flask-restx==0.5.1
 Flask-Script==2.0.6
@@ -28,7 +29,6 @@ MarkupSafe==2.0.1
 psycopg2-binary==2.8.5
 pycparser==2.18
 PyJWT==1.5.3
-PyQt5==5.15.6
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.9.0
 python-dateutil==2.6.1
