@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Patients{% endblock %}
+{% block title %}Patient Information{% endblock %}
 {% block content %}
     <h1>Patient Information</h1>
 
@@ -23,67 +23,75 @@
         <tr>
             <th scope="row">Prescriptions</th>
             <td>
-                <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Dosage</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    {% for prescription in patient.prescriptions %}
+                {% if patient.prescriptions | length > 0 %}
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <th scope="row">{{loop.index}}</th>
-                            <td>{{prescription.get_type()}}</td>
-                            <td>{{prescription.quantity}}</td>
-                            <td>{{prescription.dosage}}</td>
-                            <td>
-                                {% if prescription.get_type() == 'Standard' %}
-                                    <button type="button" class="btn btn-info">Make repeatable</button>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
+                            <th scope="col">#</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Dosage</th>
+                            <th scope="col">Action</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for prescription in patient.prescriptions %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{prescription.get_type()}}</td>
+                                <td>{{prescription.quantity}}</td>
+                                <td>{{prescription.dosage}}</td>
+                                <td>
+                                    {% if prescription.get_type() == 'Standard' %}
+                                        <button type="button" class="btn btn-info">Make repeatable</button>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    No prescription records found.
+                {% endif %}
             </td>
         </tr>
         <tr>
             <th scope="row">Appointments</th>
             <td>
-                <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Start Time</th>
-                        <th scope="col">End Time</th>
-                        <th scope="col">Healthcare Professional ID</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    {% for appointment in patient.appointments %}
+                {% if patient.appointments | length > 0 %}
+                    <table class="table">
+                        <thead>
                         <tr>
-                            <th scope="row">{{loop.index}}</th>
-                            <td>{{appointment.get_type()}}</td>
-                            <td>{{appointment.start_time}}</td>
-                            <td>{{appointment.end_time}}</td>
-                            <td>{{appointment.healthcare_professional_id}}</td>
-                            <td>
-                                {% if user.is_receptionist() %}
-                                    <button type="button" class="btn btn-danger">Cancel</button>
-                                {% endif %}
-                            </td>
+                            <th scope="col">#</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
+                            <th scope="col">Healthcare Professional ID</th>
+                            <th scope="col">Action</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for appointment in patient.appointments %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{appointment.get_type()}}</td>
+                                <td>{{appointment.start_time}}</td>
+                                <td>{{appointment.end_time}}</td>
+                                <td>{{appointment.healthcare_professional_id}}</td>
+                                <td>
+                                    {% if user.is_receptionist() %}
+                                        <button type="button" class="btn btn-danger">Cancel</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    No appointment records found.
+                {% endif %}
             </td>
         </tr>
     </table>

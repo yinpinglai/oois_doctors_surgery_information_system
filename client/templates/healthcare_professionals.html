@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Patients{% endblock %}
+{% block content %}
+    <h1 align="center">Healthcare Professionals</h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Employee Number</th>
+            <th scope="col">Name</th>
+            <th scope="col">Position</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for healthcare_professional in healthcare_professionals %}
+            <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{healthcare_professional.employee_number}}</td>
+                <td>{{healthcare_professional.name}}</td>
+                <td>{{healthcare_professional.get_position()}}</td>
+                <td>
+                    <a href="/healthcare-professional/{{healthcare_professional.public_id}}" class="btn btn-primary" role="button">View</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

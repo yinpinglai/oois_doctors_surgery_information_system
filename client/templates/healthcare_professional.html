@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Healthcare Professional Information{% endblock %}
+{% block content %}
+    <h1>Healthcare Professional Information</h1>
+
+    <table class="table">
+        <tr>
+            <th scope="row">ID</th>
+            <td>{{healthcare_professional.public_id}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Employee Number</th>
+            <td>{{healthcare_professional.employee_number}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Name</th>
+            <td>{{healthcare_professional.name}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Position</th>
+            <td>{{healthcare_professional.get_position()}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Appointments</th>
+            <td>
+                {% if healthcare_professional.appointments | length > 0 %}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
+                            <th scope="col">Healthcare Professional ID</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for appointment in healthcare_professional.appointments %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{appointment.get_type()}}</td>
+                                <td>{{appointment.start_time}}</td>
+                                <td>{{appointment.end_time}}</td>
+                                <td>{{appointment.healthcare_professional_id}}</td>
+                                <td>
+                                    {% if user.is_receptionist() %}
+                                        <button type="button" class="btn btn-danger">Cancel</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    No appointment records found.
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

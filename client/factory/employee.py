@@ -4,6 +4,7 @@ from client.model.employee import Employee
 from client.model.nurse import Nurse
 from client.model.doctor import Doctor
 from client.model.receptionist import Receptionist
+from client.factory.appointment import AppointmentFactory
 
 
 class EmployeeFactory:
@@ -20,14 +21,17 @@ class EmployeeFactory:
         name = payload['name'] or ''
         employee_number = payload['employee_number'] or ''
         position = payload['position'] or PositionType.staff.value
+        appointments = payload['appointments'] if 'appointments' in payload else []
 
         employee = None
         if position == PositionType.receptionist.value:
             employee = Receptionist()
         elif position == PositionType.doctor.value:
             employee = Doctor()
+            employee.appointments = AppointmentFactory.from_appointment_list_api_response(appointments)
         elif position == PositionType.nurse.value:
             employee = Nurse()
+            employee.appointments = AppointmentFactory.from_appointment_list_api_response(appointments)
         else:
             employee = Employee()
 
