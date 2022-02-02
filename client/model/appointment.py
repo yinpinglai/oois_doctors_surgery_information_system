@@ -1,6 +1,7 @@
+from typing import Dict, Any
 from datetime import datetime
+from client.util.datetime import DateTimeUtil
 from client.enum.appointment_type import AppointmentType
-
 
 class Appointment:
 
@@ -65,6 +66,45 @@ class Appointment:
             return 'Emergency'
         else:
             return 'Standard'
+
+    @property
+    def title(self) -> str:
+        return f'{self.get_type()} appointment - {self.healthcare_professional_id}'
+
+    @property
+    def url(self) -> str:
+        return f'/appointment/{self.public_id}'
+
+    @property
+    def event_class(self) -> str:
+        if self.type == AppointmentType.emergency.value:
+            return 'event-important'
+        else:
+            return 'event-info'
+
+    @property
+    def start(self) -> float:
+        if self.start_time is not None:
+            localized_start_time = DateTimeUtil.to_local_timezone(self.start_time)
+            return localized_start_time.timestamp() * 1000
+        return 0
+
+    @property
+    def end(self) -> float:
+        if self.end_time is not None:
+            localized_end_time = DateTimeUtil.to_local_timezone(self.end_time)
+            return localized_end_time.timestamp() * 1000
+        return 0
+
+    def serialize(self) -> Dict[str, Any]:
+        return {
+            'id': self.public_id,
+            'title': self.title,
+            'url': self.url,
+            'class': self.event_class,
+            'start': self.start,
+            'end': self.end,
+        }
 
     def __str__(self):
         return f'<Appointment for patient {self.patient_id} will be consulted by the healthcared professional {self.healthcare_professional_id}>'

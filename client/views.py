@@ -1,19 +1,36 @@
 from typing import Dict
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, send_from_directory, jsonify
 from flask_login import login_required, current_user
 
 from client.util.common import CommonUtil
 from client.service.patient_service import PatientService
+from client.service.appointment_service import AppointmentService
 from client.service.healthcare_professional_service import HealthcareProfessionalService
 
 def create_blueprint(config: Dict[str, str]) -> Blueprint:
     views = Blueprint('views', __name__)
 
+    @views.route('/manifest.json')
+    def send_manifest_json():
+        return send_from_directory('static/icons', 'manifest.json')
+
+    @views.route('/appointment-schedule', methods=['GET'])
+    @login_required
+    def appointment_schedule():
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        appointment_service = AppointmentService(config, headers)
+        appointments = [appointment.serialize() for appointment in appointment_service.get_appointment_list()]
+        resp = jsonify({
+            'success' : 1,
+            'result' : appointments,
+        })
+        resp.status_code = 200
+        return resp
+
     @views.route('/', methods=['GET'])
     @login_required
     def home():
         return render_template("home.html", user=current_user)
-
 
     @views.route('/patients', methods=['GET'])
     @login_required
