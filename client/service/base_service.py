@@ -142,8 +142,27 @@ class BaseService:
             raise e
 
 
-    def delete(self, resource_url: str, payload: Dict = {}) -> Tuple[int, Dict]:
-        pass
+    def delete(self, resource_url: str) -> Tuple[int, Dict]:
+        request_headers = self.fetch_request_headers()
+        request_url = self.fetch_request_url(resource_url)
+
+        self.print_request_debug_log_messages(
+            resource_url,
+            headers=request_headers,
+        )
+        try:
+            response = requests.delete(
+                request_url,
+                headers=request_headers,
+            )
+            self.print_response_debug_log_messages(
+                resource_url,
+                response,
+            )
+            self.handle_response(response)
+            return response.status_code, response.json()
+        except Exception as e:
+            raise e
 
 
     def __repr__(self):

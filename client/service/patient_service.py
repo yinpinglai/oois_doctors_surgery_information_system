@@ -39,6 +39,7 @@ class PatientService(BaseService):
         '''
         Gets a patient
 
+        :param public_id - The public accessible ID of the patient record
         :return patient - The patient
         :throws UnauthenticatedException | ApiCallException | Exception
         '''

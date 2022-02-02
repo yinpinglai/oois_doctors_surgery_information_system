@@ -15,7 +15,7 @@ class PrescriptionService(BaseService):
         Issues a new prescription record for patient by the doctor
 
         :param prescription - The prescription record to be saved into system
-        :returns result - The data from API response
+        :returns result - The data from the API response
         :throws UnauthenticatedException | ApiCallException | Exception
         '''
         resource_url = self.config.PRESCRIPTION_API_ISSUE_PRESCRIPTION_RESOURCE_URL

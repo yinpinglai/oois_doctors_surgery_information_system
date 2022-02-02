@@ -1,5 +1,6 @@
 from typing import Dict, Any, List
 from client.model.patient import Patient
+from client.factory.appointment import AppointmentFactory
 from client.factory.prescription import PrescriptionFactory
 
 
@@ -18,9 +19,8 @@ class PatientFactory:
         address = payload['address'] or ''
         phone = payload['phone'] or ''
 
-        # TODO: enable when the prescription and appointment classes have been implemented
         prescriptions = payload['prescriptions'] or []
-        # appointments = payload['appointments'] or []
+        appointments = payload['appointments'] or []
 
         patient = Patient()
         patient.public_id = public_id
@@ -28,6 +28,7 @@ class PatientFactory:
         patient.phone = phone
         patient.address = address
         patient.prescriptions = PrescriptionFactory.from_prescription_list_api_response(prescriptions)
+        patient.appointments = AppointmentFactory.from_appointment_list_api_response(appointments)
         return patient
 
 
