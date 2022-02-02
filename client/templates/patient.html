@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Patients{% endblock %}
+{% block content %}
+    <h1>Patient Information</h1>
+
+    <table class="table">
+        <tr>
+            <th scope="row">ID</th>
+            <td>{{patient.public_id}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Name</th>
+            <td>{{patient.name}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Phone</th>
+            <td>{{patient.phone}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Address</th>
+            <td>{{patient.address}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Prescriptions</th>
+            <td>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Dosage</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for prescription in patient.prescriptions %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{prescription.get_type()}}</td>
+                            <td>{{prescription.quantity}}</td>
+                            <td>{{prescription.dosage}}</td>
+                            <td>
+                                {% if prescription.get_type() == 'Standard' %}
+                                    <button type="button" class="btn btn-info">Make repeatable</button>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Appointments</th>
+            <td>
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Start Time</th>
+                        <th scope="col">End Time</th>
+                        <th scope="col">Healthcare Professional ID</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for appointment in patient.appointments %}
+                        <tr>
+                            <th scope="row">{{loop.index}}</th>
+                            <td>{{appointment.get_type()}}</td>
+                            <td>{{appointment.start_time}}</td>
+                            <td>{{appointment.end_time}}</td>
+                            <td>{{appointment.healthcare_professional_id}}</td>
+                            <td>
+                                {% if user.is_receptionist() %}
+                                    <button type="button" class="btn btn-danger">Cancel</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

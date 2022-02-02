@@ -1,4 +1,5 @@
 from datetime import datetime
+from client.enum.appointment_type import AppointmentType
 
 
 class Appointment:
@@ -58,6 +59,12 @@ class Appointment:
     @public_id.setter
     def public_id(self, new_public_id: str) -> None:
         self._public_id = new_public_id
+
+    def get_type(self) -> str:
+        if self.type == AppointmentType.emergency.value:
+            return 'Emergency'
+        else:
+            return 'Standard'
 
     def __str__(self):
         return f'<Appointment for patient {self.patient_id} will be consulted by the healthcared professional {self.healthcare_professional_id}>'

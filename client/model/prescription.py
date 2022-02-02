@@ -1,4 +1,5 @@
 from datetime import datetime
+from client.enum.prescription_type import PrescriptionType
 
 class Prescription:
 
@@ -66,6 +67,12 @@ class Prescription:
     @public_id.setter
     def public_id(self, new_public_id: str) -> None:
         self._public_id = new_public_id
+
+    def get_type(self) -> str:
+        if self.type == PrescriptionType.repeatable.value:
+            return 'Repeatable'
+        else:
+            return 'Standard'
 
     def __str__(self):
         return f'<Prescription for patient {self.patient_id} issued by the doctor {self.doctor_id}>'

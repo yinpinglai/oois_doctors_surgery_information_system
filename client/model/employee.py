@@ -81,12 +81,21 @@ class Employee:
     def get_id(self) -> str:
         return self.access_token
 
+    def is_receptionist(self) -> bool:
+        return self.position == PositionType.receptionist.value
+
+    def is_doctor(self) -> bool:
+        return self.position == PositionType.doctor.value
+
+    def is_nurse(self) -> bool:
+        return self.position == PositionType.nurse.value
+
     def get_position(self) -> str:
-        if PositionType.receptionist.value == self.position:
+        if self.is_receptionist():
             return 'Receptionist'
-        elif PositionType.doctor.value == self.position:
+        elif self.is_doctor():
             return 'Doctor'
-        elif PositionType.nurse.value == self.position:
+        elif self.is_nurse():
             return 'Nurse'
         else:
             return 'Staff'
