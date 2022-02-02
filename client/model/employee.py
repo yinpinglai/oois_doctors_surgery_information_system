@@ -81,6 +81,16 @@ class Employee:
     def get_id(self) -> str:
         return self.access_token
 
+    def get_position(self) -> str:
+        if PositionType.receptionist.value == self.position:
+            return 'Receptionist'
+        elif PositionType.doctor.value == self.position:
+            return 'Doctor'
+        elif PositionType.nurse.value == self.position:
+            return 'Nurse'
+        else:
+            return 'Staff'
+
     def __str__(self):
         return f'<{self.__class__.__name__} name: {self.name}>'
 

@@ -34,6 +34,8 @@ class EmployeeFactory:
         employee.public_id = public_id
         employee.name = name
         employee.employee_number = employee_number
+        employee.position = position
+
         return employee
 
     @staticmethod
