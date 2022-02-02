@@ -17,7 +17,12 @@ _user_changed_response = UserDto.user_changed_response
 class UserList(Resource):
 
     @admin_token_required
-    @api.doc('Gets the list of user')
+    @api.doc(
+        'Gets the list of user',
+        params={
+            'position': 'User\'s position.',
+        }
+    )
     @api.marshal_list_with(_user_list_api)
     def get(self):
         """List all registered users"""

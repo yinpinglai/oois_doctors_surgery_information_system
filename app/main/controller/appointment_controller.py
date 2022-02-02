@@ -1,5 +1,5 @@
 from flask import request
-from flask_restx import Resource
+from flask_restx import Resource, reqparse
 
 from app.main.dto.appointment import AppointmentDto
 from app.main.util.decorator import token_required, receptionist_token_required
@@ -18,11 +18,21 @@ _appointment_changed_response = AppointmentDto.appointment_changed_response
 class AppointmentList(Resource):
 
     @token_required
-    @api.doc('Gets the list of appointments')
+    @api.doc(
+        'Gets the list of appointments',
+        params={
+            'sort_by': 'The key used for sorting the list of appointments.',
+            'sort_order': 'The sorting order while sorting the list of appointments.',
+        }
+    )
     @api.marshal_list_with(_appointment_list_api)
     def get(self):
         ''' List all booked appointments '''
-        return get_all_appointments()
+        parser = reqparse.RequestParser()
+        parser.add_argument('sort_by', type=str, help='The key used for sorting the list of appointments.')
+        parser.add_argument('sort_order', type=str, help='The sorting order while sorting the list of appointments.')
+        params = parser.parse_args()
+        return get_all_appointments(params)
 
     @receptionist_token_required
     @api.expect(_appointment, validate=True)

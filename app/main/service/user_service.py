@@ -30,21 +30,19 @@ def save_new_user(data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
 
 
 def get_all_users(params: Dict[str, str]) -> Tuple[Dict[str, str], int]:
-    users = None
+    users_data = None
 
-    if params:
-        if params['position'] is not None and isinstance(params['position'], list):
-            users = ResponseUtil.convert_to_json_serializable(
-                User.query.filter(
-                    User.position.in_(params['position'])
-                ).all()
-            )
-
-    if users is None:
-        users = ResponseUtil.convert_to_json_serializable(
-            User.query.all()
+    if params and params['position'] is not None and isinstance(params['position'], list):
+        users_data = ResponseUtil.convert_to_json_serializable(
+            User.query.filter(
+                User.position.in_(params['position'])
+            ).all()
         )
 
+    if users_data is None:
+        users_data = User.query.all()
+
+    users = ResponseUtil.convert_to_json_serializable(users_data)
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully fetched.',

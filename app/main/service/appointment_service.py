@@ -141,10 +141,24 @@ def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
         return response_object, 200
 
 
-def get_all_appointments():
-    appointments = ResponseUtil.convert_to_json_serializable(
-        Appointment.query.all()
-    )
+def get_all_appointments(params: Dict[str, str]) -> Tuple[Dict[str, str], int]:
+    appointments_data = None
+
+    if params and params['sort_by'] is not None and params['sort_by'] == 'start_time':
+        sort_order = params['sort_order'] or 'asc'
+        if sort_order == 'desc':
+            appointments_data = Appointment.query.order_by(
+                Appointment.start_time.desc()
+            )
+        else:
+            appointments_data = Appointment.query.order_by(
+                Appointment.start_time.asc()
+            )
+
+    if appointments_data is None:
+        appointments_data = Appointment.query.all()
+
+    appointments = ResponseUtil.convert_to_json_serializable(appointments_data)
     response_object = ResponseUtil.produce_common_response_dict(
         is_success=True,
         message='Successfully fetched.',
