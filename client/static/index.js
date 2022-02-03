@@ -69,6 +69,23 @@ function makeRepeatable(patient_id, prescription_id) {
     });
 }
 
+function cancelAppointment(appointment_id) {
+    fetch('/appointment/' + appointment_id, {
+        'method': 'PUT',
+        'headers': {
+            'Content-type': 'application/json; charset=UTF-8'
+        },
+        'body': JSON.stringify({
+            'status': APPOINTMENT_STATUS.cancelled
+        })
+    }).then(function (response) {
+        window.location.href = '/appointment/' + appointment_id;
+    }).catch(function (error) {
+        console.error(error);
+        window.location.href = '/appointment/' + appointment_id;
+    });
+}
+
 function cancelPatientAppointment(patient_id, appointment_id) {
     fetch('/appointment/' + appointment_id, {
         'method': 'PUT',

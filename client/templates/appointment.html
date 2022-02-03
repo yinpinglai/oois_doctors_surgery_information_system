@@ -28,10 +28,10 @@
             <th scope="row">End time</th>
             <td>{{appointment.localized_end_time_string}}</td>
         </tr>
-        {% if user.is_doctor %}
-            <tr>
-                <th scope="row">Action</th>
-                <td>
+        <tr>
+            <th scope="row">Action</th>
+            <td>
+                {% if user.is_doctor or user.is_nurse %}
                     {% if appointment.is_pending %}
                         <button class="btn btn-primary" onClick="performConsultation('{{ appointment.public_id }}')">
                             Start consultation
@@ -47,9 +47,17 @@
                     {% else %}
                         -
                     {% endif %}
+                {% elif user.is_receptionist %}
+                    {% if appointment.is_pending %}
+                        <button class="btn btn-danger" onClick="cancelAppointment('{{ appointment.public_id }}')">
+                            Cancel
+                        </button>
+                    {% else %}
+                        -
+                    {% endif %}
+                {% endif %}
                 </td>
             </tr>
-        {% endif %}
     </table>
 
     <div class="modal fade" id="create-prescription-modal" tabindex="-1" role="dialog" aria-labelledby="create-prescription-modal" aria-hidden="true">
