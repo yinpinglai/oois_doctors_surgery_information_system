@@ -1,6 +1,7 @@
 from typing import List, Dict, Any
 from client.util.datetime import DateTimeUtil
 from client.enum.position_type import PositionType
+from client.enum.appointment_status import AppointmentStatus
 from client.model.appointment import Appointment
 from client.model.patient import Patient
 from client.model.healthcare_professional import HealthcareProfessional
@@ -16,6 +17,7 @@ class AppointmentFactory:
         :return Appointment - An appointment instacne
         '''
         type = payload['type'] or ''
+        status = payload['status'] or AppointmentStatus.pending.value
         patient_id = payload['patient_id'] or ''
         healthcare_professional_id = payload['healthcare_professional_id'] or ''
         start_time = payload['start_time'] or ''
@@ -26,6 +28,7 @@ class AppointmentFactory:
 
         appointment = Appointment()
         appointment.type = type
+        appointment.status = status
         appointment.patient_id = patient_id
         appointment.healthcare_professional_id = healthcare_professional_id
         appointment.start_time = DateTimeUtil.from_iso_datetime_string(start_time) if start_time != '' else None

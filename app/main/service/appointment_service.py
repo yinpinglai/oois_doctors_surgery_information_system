@@ -73,6 +73,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         return response_object, 409
     else:
         type = data['type'] if 'type' in data else appointment.type
+        status = data['status'] if 'status' in data else appointment.status
 
         if type != AppointmentType.standard.value and type != AppointmentType.emergency.value:
             response_object = ResponseUtil.produce_common_response_dict(
@@ -94,8 +95,8 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
         start_time = data['start_time'] if 'start_time' in data else appointment.start_time
         end_time = data['end_time'] if 'end_time' in data else appointment.end_time
 
-        parsed_start_time = parser.parse(start_time)
-        parsed_end_time = parser.parse(end_time)
+        parsed_start_time = parser.parse(start_time) if isinstance(start_time, str) else start_time
+        parsed_end_time = parser.parse(end_time) if isinstance(end_time, str) else end_time
 
         has_booked_appointment = Appointment.query.filter_by(
             start_time=parsed_start_time,
@@ -110,6 +111,7 @@ def update_an_appointment(public_id: str, data: Dict[str, str]) -> Tuple[Dict[st
             return response_object, 409
 
         appointment.type = type
+        appointment.status = status
         appointment.healthcare_professional_id = healthcare_professional.public_id
         appointment.start_time = parsed_start_time
         appointment.end_time = parsed_end_time

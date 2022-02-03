@@ -72,7 +72,7 @@ class Appointment(Resource):
         else:
             return appointment
 
-    @receptionist_token_required
+    @token_required
     @api.expect(_appointment_details, validate=True)
     @api.response(201, 'Appointment successfully updated.', _appointment_changed_response)
     @api.doc(
@@ -86,7 +86,7 @@ class Appointment(Resource):
         data = request.json
         return update_an_appointment(public_id, data)
 
-    @receptionist_token_required
+    @token_required
     @api.response(200, 'Appointment record successfully deleted.', _appointment_changed_response)
     @api.doc('Deletes an appointment')
     def delete(self, public_id):

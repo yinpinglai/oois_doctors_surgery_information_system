@@ -1,5 +1,5 @@
 from typing import Dict
-from flask import Blueprint, render_template, send_from_directory, jsonify
+from flask import Blueprint, render_template, send_from_directory, request, jsonify
 from flask_login import login_required, current_user
 
 from client.util.common import CommonUtil
@@ -34,14 +34,26 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
         resp.status_code = 200
         return resp
 
-    @views.route('/appointment/<public_id>', methods=['GET'])
+    @views.route('/appointment/<public_id>', methods=['GET', 'PUT'])
     @login_required
     def appointment(public_id: str):
         headers = CommonUtil.construct_request_headers(current_user.access_token)
         appointment_service = AppointmentService(config, headers)
 
+        if request.method == 'PUT':
+            data = request.json
+            if data['status'] is not None:
+                try:
+                    result = appointment_service.change_appointment_status(public_id, data)
+                    resp = jsonify(result)
+                    resp.status_code = 201
+                    return resp
+                except Exception as e:
+                    resp = jsonify({ 'is_success': False, 'message': str(e) })
+                    resp.status_code = 500
+                    return resp
+
         appointment = appointment_service.get_appointment(public_id)
-        print(repr(appointment))
         return render_template('appointment.html', appointment=appointment, user=current_user)
 
     @views.route('/patients', methods=['GET'])

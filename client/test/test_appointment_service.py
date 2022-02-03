@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from client.config import config_by_name
 from client.model.appointment import Appointment
 from client.enum.appointment_type import AppointmentType
+from client.enum.appointment_status import AppointmentStatus
 from client.service.auth_service import AuthService
 from client.service.patient_service import PatientService
 from client.service.appointment_service import AppointmentService
@@ -89,8 +90,28 @@ class TestAppointmentService(unittest.TestCase):
         result = appointment_service.make_an_appointment(appointment)
         assert result['id'] is not None
         appointment.public_id = result['id']
+        appointment.status = AppointmentStatus.cancelled.value
 
         result = appointment_service.cancel_an_appointment(appointment)
+        assert result['id'] is not None
+
+    def test_perform_consulting_service(self):
+        assert self.token is not None
+        assert self.healthcare_professional is not None
+        assert self.patient is not None
+
+        appointment_service = AppointmentService(self.config, self.headers)
+        appointment = Appointment()
+        appointment.type = AppointmentType.standard.value
+        appointment.patient_id = self.patient.public_id
+        appointment.healthcare_professional_id = self.healthcare_professional.public_id
+        appointment.start_time = datetime.utcnow()
+        appointment.end_time = appointment.start_time + timedelta(hours=1)
+        result = appointment_service.make_an_appointment(appointment)
+        assert result['id'] is not None
+        appointment.public_id = result['id']
+
+        result = appointment_service.perform_consulting_service(appointment)
         assert result['id'] is not None
 
 

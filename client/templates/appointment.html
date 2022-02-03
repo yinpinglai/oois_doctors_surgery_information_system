@@ -9,6 +9,10 @@
             <td>{{appointment.public_id}}</td>
         </tr>
         <tr>
+            <th scope="row">Status</th>
+            <td>{{appointment.current_status}}</td>
+        </tr>
+        <tr>
             <th scope="row">Patient Name</th>
             <td>{{appointment.patient.name}}</td>
         </tr>
@@ -24,14 +28,24 @@
             <th scope="row">End time</th>
             <td>{{appointment.localized_end_time_string}}</td>
         </tr>
-        <tr>
-            <th scope="row">Action</th>
-            <td>
-                {% if user.is_doctor %}
-                    <button class="btn btn-primary">Start consultation</button>
-                {% endif %}
-            </td>
-        </tr>
+        {% if user.is_doctor %}
+            <tr>
+                <th scope="row">Action</th>
+                <td>
+                    {% if appointment.is_pending %}
+                        <button class="btn btn-primary" onClick="performConsultation('{{ appointment.public_id }}')">
+                            Start consultation
+                        </button>
+                    {% elif appointment.is_consulting %}
+                        <button class="btn btn-primary" onClick="finishConsultation('{{ appointment.public_id }}')">
+                            Finish consultation
+                        </button>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endif %}
     </table>
 {% endblock %}
 

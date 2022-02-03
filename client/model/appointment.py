@@ -2,6 +2,7 @@ from typing import Dict, Any
 from datetime import datetime
 from client.util.datetime import DateTimeUtil
 from client.enum.appointment_type import AppointmentType
+from client.enum.appointment_status import AppointmentStatus
 from .patient import Patient
 from .healthcare_professional import HealthcareProfessional
 
@@ -9,6 +10,7 @@ class Appointment:
 
     def __init__(self) -> None:
         self._type = ''
+        self._status = 1
         self._patient_id = ''
         self._healthcare_professional_id = ''
         self._start_time = None
@@ -24,6 +26,14 @@ class Appointment:
     @type.setter
     def type(self, new_type: str) -> None:
         self._type = new_type
+
+    @property
+    def status(self) -> int:
+        return self._status
+
+    @status.setter
+    def status(self, new_status: int) -> None:
+        self._status = new_status
 
     @property
     def patient_id(self) -> str:
@@ -142,6 +152,39 @@ class Appointment:
         else:
             return ''
 
+    @property
+    def is_pending(self) -> bool:
+        return self.status == AppointmentStatus.pending.value
+
+    @property
+    def is_consulting(self) -> bool:
+        return self.status == AppointmentStatus.consulting.value
+
+    @property
+    def is_finished(self) -> bool:
+        return self.status == AppointmentStatus.finished.value
+
+    @property
+    def is_cancelled(self) -> bool:
+        return self.status == AppointmentStatus.cancelled.value
+
+    @property
+    def is_expired(self) -> bool:
+        return self.status == AppointmentStatus.expired.value
+
+    @property
+    def current_status(self) -> str:
+        if self.is_consulting:
+            return 'Consulting'
+        elif self.is_finished:
+            return 'Completed'
+        elif self.is_cancelled:
+            return 'Cancelled'
+        elif self.is_expired:
+            return 'Expired'
+        else:
+            return 'Pending'
+
     def __str__(self):
         return f'<Appointment for patient {self.patient_id} will be consulted by the healthcared professional {self.healthcare_professional_id}>'
 
@@ -149,6 +192,7 @@ class Appointment:
         return f'''
             Appointment: (
                 type: {self.type},
+                status: {self.status},
                 patient_id: {self.patient_id},
                 healthcare_professional_id: {self.healthcare_professional_id},
                 start_time: {self.start_time},
