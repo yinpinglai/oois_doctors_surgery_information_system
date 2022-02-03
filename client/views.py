@@ -2,13 +2,16 @@ from typing import Dict
 from flask import Blueprint, render_template, send_from_directory, request, jsonify, abort, flash, redirect, url_for
 from flask_login import login_required, current_user
 
+from client.model.appointment import Appointment
 from client.model.prescription import Prescription
+from client.enum.appointment_type import AppointmentType
 from client.enum.prescription_type import PrescriptionType
 from client.util.common import CommonUtil
 from client.service.patient_service import PatientService
 from client.service.appointment_service import AppointmentService
 from client.service.prescription_service import PrescriptionService
 from client.service.healthcare_professional_service import HealthcareProfessionalService
+from client.util.datetime import DateTimeUtil
 
 def create_blueprint(config: Dict[str, str]) -> Blueprint:
     views = Blueprint('views', __name__)
@@ -20,7 +23,20 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
     @views.route('/', methods=['GET'])
     @login_required
     def home():
-        return render_template("home.html", user=current_user)
+        host = f'{config.HOST}:{config.PORT}'
+        return render_template('appointment_schedule.html', host=host, user=current_user)
+
+    @views.route('/appointment/new', methods=['GET'])
+    @login_required
+    def appointment_form():
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        patient_service = PatientService(config, headers)
+        healthcare_professional_service = HealthcareProfessionalService(config, headers)
+
+        patients = patient_service.get_patient_list()
+        healthcare_professionals = healthcare_professional_service.get_healthcare_professional_list()
+
+        return render_template('appointment_form.html', patients=patients, healthcare_professionals=healthcare_professionals, user=current_user)
 
     @views.route('/appointment-schedule', methods=['GET'])
     @login_required
@@ -36,6 +52,41 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
         })
         resp.status_code = 200
         return resp
+
+    @views.route('/appointment', methods=['POST'])
+    @login_required
+    def appointments():
+        data = request.form
+        type = data['type'] or AppointmentType.standard.value
+        patient_id = data['patient_id'] or None
+        healthcare_professional_id = data['healthcare_professional_id'] or None
+        start_time = data['start_time'] or None
+        end_time = data['end_time'] or None
+
+        if patient_id is None or healthcare_professional_id is None or start_time is None or end_time is None:
+            flash('Required parameter is missing!', category='error')
+            return redirect(url_for('views.appointment_form'))
+
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        appointment_service = AppointmentService(config, headers)
+
+        appointment = Appointment()
+        appointment.type = type
+        appointment.patient_id = patient_id
+        appointment.healthcare_professional_id = healthcare_professional_id
+        appointment.start_time = DateTimeUtil.from_iso_datetime_string(start_time)
+        appointment.end_time = DateTimeUtil.from_iso_datetime_string(end_time)
+
+        try:
+            result = appointment_service.make_an_appointment(appointment)
+            if result is not None and result['id'] is not None:
+                flash('Made an appointment for patient successfully!', category='success')
+        except Exception as e:
+            print(e)
+            flash('Make an appointment failed, please contact administrators.', category='error')
+
+        return redirect(url_for('views.home'))
+
 
     @views.route('/appointment/<public_id>', methods=['GET', 'PUT'])
     @login_required

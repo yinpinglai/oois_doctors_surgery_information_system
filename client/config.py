@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
+    HOST = 'http://127.0.0.1'
     PORT = 5050
     SECRET_KEY = 'thisisthesecretkey'
 
