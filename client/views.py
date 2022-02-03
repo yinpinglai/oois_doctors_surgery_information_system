@@ -93,9 +93,36 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
                 print(e)
                 flash('Issue a prescription failed, please contact administrator.', category='error')
 
-            return redirect(url_for(f'views.appointment', public_id=appointment_id))
+            return redirect(url_for('views.appointment', public_id=appointment_id))
 
         abort(404)
+
+    @views.route('/prescription/<public_id>/type', methods=['PUT'])
+    @login_required
+    def prescrtipion_details(public_id: str):
+        payload = request.json
+        patient_id = payload['patient_id'] or None
+        type = payload['type'] or None
+
+        if type is None or patient_id is None:
+            abort(400)
+
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        prescription_service = PrescriptionService(config, headers)
+
+        prescription = Prescription()
+        prescription.type = type
+        prescription.public_id = public_id
+
+        try:
+            result = prescription_service.request_an_repeatable_prescription(prescription)
+            if result is not None and result['id'] is not None:
+                flash('Made an repeatable prescription successfully!', category='success')
+        except Exception as e:
+            print(e)
+            flash('Make an repeatable prescritpion failed, please contact administrator.', category='error')
+
+        return redirect(url_for('views.patient', public_id=patient_id))
 
     @views.route('/patients', methods=['GET'])
     @login_required

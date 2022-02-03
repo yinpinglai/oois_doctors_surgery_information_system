@@ -6,14 +6,19 @@ var APPOINTMENT_STATUS = {
     'expired': 5
 };
 
+var PRESCRIPTION_TYPE = {
+    'standard': 's',
+    'repeatable': 'r'
+};
+
 function changingAppointmentStatus(appointment_id, status, successCallback, errorCallback) {
     fetch('/appointment/' + appointment_id, {
         'method': 'PUT',
-        headers: {
+        'headers': {
             'Content-type': 'application/json; charset=UTF-8'
         },
         'body': JSON.stringify({
-            status: status
+            'status': status
         })
     }).then(successCallback).catch(errorCallback);
 }
@@ -44,4 +49,21 @@ function finishConsultation(appointment_id) {
             window.location.href = '/appointment/' + appointment_id;
         }
     );
+}
+
+function makeRepeatable(patient_id, prescription_id) {
+    fetch('/prescription/' + prescription_id + '/type', {
+        'method': 'PUT',
+        'headers': {
+            'Content-type': 'application/json; charset=UTF-8'
+        },
+        'body': JSON.stringify({
+            'patient_id': patient_id,
+            'type': PRESCRIPTION_TYPE.repeatable
+        })
+    }).then(function (response) {
+        window.location.href = '/patient/' + patient_id;
+    }).catch(function (error) {
+        window.location.href = '/patient/' + patient_id;
+    });
 }

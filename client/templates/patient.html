@@ -43,7 +43,7 @@
                                 <td>{{prescription.dosage}}</td>
                                 <td>
                                     {% if prescription.get_type() == 'Standard' %}
-                                        <button type="button" class="btn btn-info">Make repeatable</button>
+                                        <button type="button" class="btn btn-info" onclick="makeRepeatable('{{patient.public_id}}', '{{prescription.public_id}}')">Make repeatable</button>
                                     {% else %}
                                         -
                                     {% endif %}
@@ -68,7 +68,7 @@
                             <th scope="col">Type</th>
                             <th scope="col">Start Time</th>
                             <th scope="col">End Time</th>
-                            <th scope="col">Healthcare Professional ID</th>
+                            <th scope="col">Healthcare Professional</th>
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
@@ -77,9 +77,9 @@
                             <tr>
                                 <th scope="row">{{loop.index}}</th>
                                 <td>{{appointment.get_type()}}</td>
-                                <td>{{appointment.start_time}}</td>
-                                <td>{{appointment.end_time}}</td>
-                                <td>{{appointment.healthcare_professional_id}}</td>
+                                <td>{{appointment.localized_start_time_string}}</td>
+                                <td>{{appointment.localized_end_time_string}}</td>
+                                <td>{{appointment.healthcare_professional.get_position()}} - {{appointment.healthcare_professional.name}}</td>
                                 <td>
                                     {% if user.is_receptionist %}
                                         <button type="button" class="btn btn-danger">Cancel</button>

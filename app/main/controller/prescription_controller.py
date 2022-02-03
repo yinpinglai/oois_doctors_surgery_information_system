@@ -56,7 +56,7 @@ class Prescription(Resource):
         else:
             return prescription
 
-    @doctor_token_required
+    @token_required
     @api.expect(_prescription_details, validate=True)
     @api.response(201, 'Prescription successfully updated.', _prescription_changed_response)
     @api.doc(

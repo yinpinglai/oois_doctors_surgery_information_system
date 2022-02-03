@@ -48,7 +48,7 @@ def create_blueprint(config):
                     logout_user()
             except Exception as e:
                 print(e)
-                flash(f'Logout failed: {e}')
+                flash(f'Logout failed: {e}', category='error')
             finally:
                 return redirect(url_for('auth.login'))
 
