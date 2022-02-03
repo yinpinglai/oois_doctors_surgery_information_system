@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Patient Information{% endblock %}
+{% block title %}Appointment Details{% endblock %}
 {% block content %}
     <h1>Appointment Details</h1>
 
@@ -40,6 +40,10 @@
                         <button class="btn btn-primary" onClick="finishConsultation('{{ appointment.public_id }}')">
                             Finish consultation
                         </button>
+                    {% elif appointment.is_finished %}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-prescription-modal">
+                            Issue a prescription
+                        </button>
                     {% else %}
                         -
                     {% endif %}
@@ -47,5 +51,43 @@
             </tr>
         {% endif %}
     </table>
+
+    <div class="modal fade" id="create-prescription-modal" tabindex="-1" role="dialog" aria-labelledby="create-prescription-modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="POST" action="/prescription">
+                    <input type="hidden" id="appointment_id" name="appointment_id" value="{{appointment.public_id}}" />
+                    <input type="hidden" id="patient_id" name="patient_id" value="{{appointment.patient_id}}" />
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Issue a prescription</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select id="type" name="type" class="form-control form-control-lg">
+                                <option value="s">Standard</option>
+                                <option value="r">Repeatable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                        <label for="dosage">Dosage</label>
+                        <input type="text" class="form-control" id="dosage" name="dosage">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+            </form>
+          </div>
+        </div>
+    </div>
 {% endblock %}
 

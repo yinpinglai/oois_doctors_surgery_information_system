@@ -1,10 +1,13 @@
 from typing import Dict
-from flask import Blueprint, render_template, send_from_directory, request, jsonify
+from flask import Blueprint, render_template, send_from_directory, request, jsonify, abort, flash, redirect, url_for
 from flask_login import login_required, current_user
 
+from client.model.prescription import Prescription
+from client.enum.prescription_type import PrescriptionType
 from client.util.common import CommonUtil
 from client.service.patient_service import PatientService
 from client.service.appointment_service import AppointmentService
+from client.service.prescription_service import PrescriptionService
 from client.service.healthcare_professional_service import HealthcareProfessionalService
 
 def create_blueprint(config: Dict[str, str]) -> Blueprint:
@@ -55,6 +58,44 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
 
         appointment = appointment_service.get_appointment(public_id)
         return render_template('appointment.html', appointment=appointment, user=current_user)
+
+    @views.route('/prescription', methods=['POST'])
+    @login_required
+    def prescription():
+        if request.method == 'POST':
+            data = request.form
+
+            appointment_id = data['appointment_id'] or None
+            type = data['type'] if 'type' in data else PrescriptionType.standard.value
+            patient_id = data['patient_id'] or None
+            doctor_id = current_user.public_id
+            quantity = data['quantity'] or 0
+            dosage = data['dosage'] or ''
+
+            if patient_id is None or not current_user.is_doctor or appointment_id is None:
+                abort(400)
+
+            headers = CommonUtil.construct_request_headers(current_user.access_token)
+            prescription_service = PrescriptionService(config, headers)
+
+            prescription = Prescription()
+            prescription.type = type
+            prescription.patient_id = patient_id
+            prescription.doctor_id = doctor_id
+            prescription.quantity = int(quantity)
+            prescription.dosage = dosage
+
+            try:
+                result = prescription_service.issue_prescription(prescription)
+                if result is not None and result['id'] is not None:
+                    flash('Issued a prescription for patient successfully!', category='success')
+            except Exception as e:
+                print(e)
+                flash('Issue a prescription failed, please contact administrator.', category='error')
+
+            return redirect(url_for(f'views.appointment', public_id=appointment_id))
+
+        abort(404)
 
     @views.route('/patients', methods=['GET'])
     @login_required
