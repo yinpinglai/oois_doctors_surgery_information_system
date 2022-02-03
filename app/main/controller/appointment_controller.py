@@ -21,6 +21,7 @@ class AppointmentList(Resource):
     @api.doc(
         'Gets the list of appointments',
         params={
+            'healthcare_professional_id': 'The healthcare professional ID used for filtering the list of appointments.',
             'start_time': 'The start time used for filtering the list of appointments.',
             'end_time': 'The end time used for filtering the list of appointments.',
             'sort_by': 'The key used for sorting the list of appointments.',
@@ -31,6 +32,7 @@ class AppointmentList(Resource):
     def get(self):
         ''' List all booked appointments '''
         parser = reqparse.RequestParser()
+        parser.add_argument('healthcare_professional_id', type=str, help='The healthcare professional ID used for filtering the list of appointments.')
         parser.add_argument('start_time', type=str, help='The start time used for filtering the list of appointments.')
         parser.add_argument('end_time', type=str, help='The end time used for filtering the list of appointments.')
         parser.add_argument('sort_by', type=str, help='The key used for sorting the list of appointments.')

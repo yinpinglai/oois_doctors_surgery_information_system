@@ -1,1 +1,2 @@
 .me-auto { margin-right: auto !important; }
+#cal-day-panel > div.pull-left.day-event.day-highlight.dh-event-info > a { float: left; }

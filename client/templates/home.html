@@ -31,7 +31,7 @@
 			<div class="span3">
                 <div class="row-fluid">
                     <h3>Operation</h3>
-                    {% if user.is_receptionist() %}
+                    {% if user.is_receptionist %}
                         <button>Make an appointment</button>
                     {% endif %}
                 </div>
@@ -66,11 +66,10 @@
                 "use strict";
                 var options = {
                     events_source: 'http://127.0.0.1:5050/appointment-schedule',
-                    view: 'day',
+                    view: 'month',
                     tmpl_path: '../../static/tmpls/',
                     tmpl_cache: false,
                     onAfterViewLoad: function(view) {
-                        console.log(view);
                         $('.page-header h3').text(this.getTitle());
                         $('.btn-group button').removeClass('active');
                         $('button[data-calendar-view="' + view + '"]').addClass('active');

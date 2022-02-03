@@ -14,12 +14,19 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
     def send_manifest_json():
         return send_from_directory('static/icons', 'manifest.json')
 
+    @views.route('/', methods=['GET'])
+    @login_required
+    def home():
+        return render_template("home.html", user=current_user)
+
     @views.route('/appointment-schedule', methods=['GET'])
     @login_required
     def appointment_schedule():
+        is_healthcare_professional = current_user.is_doctor or current_user.is_nurse
         headers = CommonUtil.construct_request_headers(current_user.access_token)
         appointment_service = AppointmentService(config, headers)
-        appointments = [appointment.serialize() for appointment in appointment_service.get_appointment_list()]
+        appointment_list = appointment_service.get_appointment_list(current_user.public_id) if is_healthcare_professional else appointment_service.get_appointment_list()
+        appointments = [appointment.to_calendar_event() for appointment in appointment_list]
         resp = jsonify({
             'success' : 1,
             'result' : appointments,
@@ -27,10 +34,15 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
         resp.status_code = 200
         return resp
 
-    @views.route('/', methods=['GET'])
+    @views.route('/appointment/<public_id>', methods=['GET'])
     @login_required
-    def home():
-        return render_template("home.html", user=current_user)
+    def appointment(public_id: str):
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        appointment_service = AppointmentService(config, headers)
+
+        appointment = appointment_service.get_appointment(public_id)
+        print(repr(appointment))
+        return render_template('appointment.html', appointment=appointment, user=current_user)
 
     @views.route('/patients', methods=['GET'])
     @login_required

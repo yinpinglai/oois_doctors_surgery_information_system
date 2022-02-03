@@ -145,6 +145,11 @@ def delete_an_appointment(public_id: str) -> Tuple[Dict[str, str], int]:
 def get_all_appointments(params: Dict[str, str]) -> Tuple[Dict[str, str], int]:
     appointments_query = Appointment.query
 
+    if params and params['healthcare_professional_id'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.healthcare_professional_id == params['healthcare_professional_id']
+        )
+
     if params and params['start_time'] is not None:
         appointments_query = appointments_query.filter(
             Appointment.start_time >= DateTimeUtil.from_iso_datetime_string(params['start_time'])

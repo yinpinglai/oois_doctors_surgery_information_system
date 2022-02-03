@@ -18,6 +18,8 @@ class Appointment(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     booked_on = db.Column(db.DateTime, nullable=False, default=func.now())
     public_id = db.Column(db.String(100), unique=True)
+    patient = db.relationship('Patient')
+    healthcare_professional = db.relationship('User')
 
     def serialize(self):
         '''

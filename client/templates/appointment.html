@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Patient Information{% endblock %}
+{% block content %}
+    <h1>Appointment Details</h1>
+
+    <table class="table">
+        <tr>
+            <th scope="row">ID</th>
+            <td>{{appointment.public_id}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Patient Name</th>
+            <td>{{appointment.patient.name}}</td>
+        </tr>
+        <tr>
+            <th scope="row">{{appointment.healthcare_professional.get_position()}} Name</th>
+            <td>{{appointment.healthcare_professional.name}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Start time</th>
+            <td>{{appointment.localized_start_time_string}}</td>
+        </tr>
+        <tr>
+            <th scope="row">End time</th>
+            <td>{{appointment.localized_end_time_string}}</td>
+        </tr>
+        <tr>
+            <th scope="row">Action</th>
+            <td>
+                {% if user.is_doctor %}
+                    <button class="btn btn-primary">Start consultation</button>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+{% endblock %}
+

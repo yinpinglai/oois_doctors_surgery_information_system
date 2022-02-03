@@ -2,6 +2,8 @@ from typing import Dict, Any
 from datetime import datetime
 from client.util.datetime import DateTimeUtil
 from client.enum.appointment_type import AppointmentType
+from .patient import Patient
+from .healthcare_professional import HealthcareProfessional
 
 class Appointment:
 
@@ -12,6 +14,8 @@ class Appointment:
         self._start_time = None
         self._end_time = None
         self._public_id = ''
+        self._patient = None
+        self._healthcare_professional = None
 
     @property
     def type(self) -> str:
@@ -61,6 +65,22 @@ class Appointment:
     def public_id(self, new_public_id: str) -> None:
         self._public_id = new_public_id
 
+    @property
+    def patient(self) -> Patient:
+        return self._patient
+
+    @patient.setter
+    def patient(self, new_patient: Patient) -> None:
+        self._patient = new_patient
+
+    @property
+    def healthcare_professional(self) -> HealthcareProfessional:
+        return self._healthcare_professional
+
+    @healthcare_professional.setter
+    def healthcare_professional(self, new_healthcare_professional: HealthcareProfessional) -> None:
+        self._healthcare_professional = new_healthcare_professional
+
     def get_type(self) -> str:
         if self.type == AppointmentType.emergency.value:
             return 'Emergency'
@@ -69,7 +89,7 @@ class Appointment:
 
     @property
     def title(self) -> str:
-        return f'{self.get_type()} appointment - {self.healthcare_professional_id}'
+        return f'{self.get_type()} appointment'
 
     @property
     def url(self) -> str:
@@ -96,7 +116,7 @@ class Appointment:
             return localized_end_time.timestamp() * 1000
         return 0
 
-    def serialize(self) -> Dict[str, Any]:
+    def to_calendar_event(self) -> Dict[str, Any]:
         return {
             'id': self.public_id,
             'title': self.title,
@@ -105,6 +125,22 @@ class Appointment:
             'start': self.start,
             'end': self.end,
         }
+
+    @property
+    def localized_start_time_string(self) -> str:
+        if self.start_time:
+            localized_start_time = DateTimeUtil.to_local_timezone(self.start_time)
+            return localized_start_time.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            return ''
+
+    @property
+    def localized_end_time_string(self) -> str:
+        if self.end_time:
+            localized_end_time = DateTimeUtil.to_local_timezone(self.end_time)
+            return localized_end_time.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            return ''
 
     def __str__(self):
         return f'<Appointment for patient {self.patient_id} will be consulted by the healthcared professional {self.healthcare_professional_id}>'
@@ -118,5 +154,7 @@ class Appointment:
                 start_time: {self.start_time},
                 end_time: {self.end_time},
                 public_id: {self.public_id},
+                patient: {repr(self.patient)},
+                healthcare_professional: {repr(self.healthcare_professional)},
             )
         '''

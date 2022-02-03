@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource, reqparse
 
 from app.main.dto.user import UserDto
-from app.main.util.decorator import token_required, admin_token_required
+from app.main.util.decorator import token_required
 from ..service.user_service import save_new_user, get_all_users, get_a_user
 from typing import Dict, Tuple
 
@@ -16,7 +16,7 @@ _user_changed_response = UserDto.user_changed_response
 @api.route('/')
 class UserList(Resource):
 
-    @admin_token_required
+    @token_required
     @api.doc(
         'Gets the list of user',
         params={
@@ -31,7 +31,7 @@ class UserList(Resource):
         params = parser.parse_args()
         return get_all_users(params)
 
-    @admin_token_required
+    @token_required
     @api.expect(_user, validate=True)
     @api.response(201, 'User successfully created.', _user_changed_response)
     @api.doc(
