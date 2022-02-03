@@ -18,7 +18,7 @@ class AppointmentDto:
     })
     appointment = api.model('appointment', {
         'type': fields.String(required=True, description='appointment type'),
-        'status': fields.Integer(required=True, description='appointment status'),
+        'status': fields.Integer(description='appointment status'),
 		'patient_id': fields.String(required=True, description='appointment booked for patient'),
 		'healthcare_professional_id': fields.String(required=True, description='appointment assigned to healthcare professional'),
 		'start_time': fields.DateTime(required=True, description='appointment start time'),

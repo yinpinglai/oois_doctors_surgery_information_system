@@ -66,6 +66,7 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Type</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Start Time</th>
                             <th scope="col">End Time</th>
                             <th scope="col">Healthcare Professional</th>
@@ -77,12 +78,15 @@
                             <tr>
                                 <th scope="row">{{loop.index}}</th>
                                 <td>{{appointment.get_type()}}</td>
+                                <td>{{appointment.current_status}}</td>
                                 <td>{{appointment.localized_start_time_string}}</td>
                                 <td>{{appointment.localized_end_time_string}}</td>
                                 <td>{{appointment.healthcare_professional.get_position()}} - {{appointment.healthcare_professional.name}}</td>
                                 <td>
-                                    {% if user.is_receptionist %}
-                                        <button type="button" class="btn btn-danger">Cancel</button>
+                                    {% if user.is_receptionist and appointment.is_pending %}
+                                        <button type="button" class="btn btn-danger" onclick="cancelPatientAppointment('{{patient.public_id}}', '{{appointment.public_id}}')">Cancel</button>
+                                    {% else %}
+                                        -
                                     {% endif %}
                                 </td>
                             </tr>
