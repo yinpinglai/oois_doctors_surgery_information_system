@@ -1,7 +1,10 @@
 body { font-size: 16px !important;}
 .me-auto { margin-right: auto !important; }
+.mb-10 { margin-bottom: 10px; }
+
 #cal-day-panel > div.pull-left.day-event.day-highlight.dh-event-info > a { float: left; }
 p.navbar-text { margin: 0 !important; }
+
 @media (min-width: 768px) {
     .navbar-nav>li>a {
         padding: 8px !important;

@@ -17,11 +17,16 @@
     </div>
     <div class="form-group">
         <label for="type">Patient</label>
-        <select id="patient_id" name="patient_id" class="form-control form-control-lg">
-            {% for patient in patients %}
-                <option value="{{patient.public_id}}">{{patient.name}}</option>
-            {% endfor %}
-        </select>
+        {% if patients | length > 0 %}
+            <select id="patient_id" name="patient_id" class="form-control form-control-lg">
+                {% for patient in patients %}
+                    <option value="{{patient.public_id}}">{{patient.name}}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input type="hidden" class="form-control" id="patient_id" name="patient_id" value="{{patient.public_id}}" />
+            <input type="text" class="form-control" id="patient_id" name="patient_id" value="{{patient.name}}" disabled />
+        {% endif %}
     </div>
     <div class="form-group">
         <label for="type">Healthcare Professional</label>

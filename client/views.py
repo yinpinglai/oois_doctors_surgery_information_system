@@ -38,6 +38,18 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
 
         return render_template('appointment_form.html', patients=patients, healthcare_professionals=healthcare_professionals, user=current_user)
 
+    @views.route('/appointment/new/<public_id>', methods=['GET'])
+    @login_required
+    def appointment_form_for_patient(public_id: str):
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        patient_service = PatientService(config, headers)
+        healthcare_professional_service = HealthcareProfessionalService(config, headers)
+
+        patient = patient_service.get_patient(public_id)
+        healthcare_professionals = healthcare_professional_service.get_healthcare_professional_list()
+
+        return render_template('appointment_form.html', patient=patient, healthcare_professionals=healthcare_professionals, user=current_user)
+
     @views.route('/appointment-schedule', methods=['GET'])
     @login_required
     def appointment_schedule():

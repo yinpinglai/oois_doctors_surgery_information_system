@@ -3,6 +3,10 @@
 {% block content %}
     <h1>Patient Information</h1>
 
+    <div class="row-fluid mb-10">
+        <a href="/appointment/new/{{patient.public_id}}" class="btn btn-primary" role="button">Request an appointment</a>
+    </div>
+
     <table class="table">
         <tr>
             <th scope="row">ID</th>
