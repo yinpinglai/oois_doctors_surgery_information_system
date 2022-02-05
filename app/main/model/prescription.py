@@ -13,12 +13,12 @@ class Prescription(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     type = db.Column(db.String(1), nullable=False, default=PrescriptionType.standard.value)
-    patient_id = db.Column(db.String, db.ForeignKey('patient.public_id'))
-    doctor_id = db.Column(db.String, db.ForeignKey('user.public_id'))
+    patient_id = db.Column(db.String(100), db.ForeignKey('patient.public_id'))
+    doctor_id = db.Column(db.String(100), db.ForeignKey('user.public_id'))
     quantity = db.Column(db.Integer, nullable=False, default=0)
-    dosage = db.Column(db.String(255), nullable=False, default=0.0)
+    dosage = db.Column(db.String(255), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False, default=func.now())
-    public_id = db.Column(db.String(100), unique=True)
+    public_id = db.Column(db.String(100), nullable=False, unique=True)
 
     def serialize(self) -> Dict[str, Any]:
         '''

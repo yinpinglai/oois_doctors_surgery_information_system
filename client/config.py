@@ -46,7 +46,6 @@ class Config:
     APPOINTMENT_API_GET_NEXT_AVAILABLE_TIMESLOT_RESOURCE_URL = 'appointment'
 
 
-
 class DevelopmentConfig(Config):
     DEBUG = True
 

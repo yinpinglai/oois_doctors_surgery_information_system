@@ -15,7 +15,7 @@ class Patient(db.Model):
     address = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(255), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=func.now())
-    public_id = db.Column(db.String(100), unique=True)
+    public_id = db.Column(db.String(100), nullable=False, unique=True)
     prescriptions = db.relationship('Prescription')
     appointments = db.relationship('Appointment')
 

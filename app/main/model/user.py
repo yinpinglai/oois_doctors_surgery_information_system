@@ -26,7 +26,7 @@ class User(db.Model):
     admin = db.Column(db.Boolean, nullable=False, default=False)
     appointments = db.relationship('Appointment')
     registered_on = db.Column(db.DateTime, nullable=False, default=func.now())
-    public_id = db.Column(db.String(100), unique=True)
+    public_id = db.Column(db.String(100), nullable=False, unique=True)
 
     @property
     def password(self):
