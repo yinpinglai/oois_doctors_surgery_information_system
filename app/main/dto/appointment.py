@@ -36,12 +36,20 @@ class AppointmentDto:
         'patient': fields.Nested(appointment_patient),
         'healthcare_professional': fields.Nested(appointment_healthcare_professional),
     })
+    appointment_next_available = api.model('appointment_next_available', {
+		'healthcare_professional_id': fields.String(description='appointment assigned to healthcare professional'),
+		'start_time': fields.String(description='appointment start time'),
+		'end_time': fields.String(description='appointment end time'),
+    })
     appointment_list_api = api.model('appointment_list_api', produce_api_response_structure(
         appointment,
         is_list=True,
     ))
     appointment_details_api = api.model('appointment_details_api', produce_api_response_structure(
         appointment,
+    ))
+    appointment_next_available_api = api.model('appointment_next_available_api', produce_api_response_structure(
+        appointment_next_available,
     ))
     appointment_changed_response = api.model('appointment_changed_response', produce_api_response_structure(
         api.model('appointment_successfully_changed_response', {

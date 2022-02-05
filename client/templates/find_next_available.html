@@ -29,7 +29,6 @@
                     response.json().then(function (data) {
                         if (data['success'] && data['result']) {
                             var appointments = data['result'];
-                            console.log(appointments);
 
                             var now = moment();
                             var dateFormat = 'YYYY-MM-DD HH:mm';

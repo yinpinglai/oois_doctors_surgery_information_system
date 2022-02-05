@@ -1,3 +1,4 @@
+import time
 from dateutil import parser
 from datetime import date, datetime
 
@@ -28,3 +29,14 @@ class DateTimeUtil:
 
         return datetime_instance
 
+    @staticmethod
+    def to_local_timezone(utc_datetime_instance: datetime) -> datetime:
+        '''
+        Converts the UTC datetime instance to the local timezone
+
+        :param datetime_instance - The datetime instance to be converted
+        :return localized_datetime_instance - The localized datetime instance
+        '''
+        now_timestamp = time.time()
+        offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+        return utc_datetime_instance + offset

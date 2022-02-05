@@ -3,7 +3,7 @@ from flask_restx import Resource, reqparse
 
 from app.main.dto.appointment import AppointmentDto
 from app.main.util.decorator import token_required, receptionist_token_required
-from ..service.appointment_service import delete_an_appointment, save_new_appointment, get_all_appointments, get_an_appointment, update_an_appointment, delete_an_appointment
+from ..service.appointment_service import delete_an_appointment, save_new_appointment, get_all_appointments, get_an_appointment, update_an_appointment, delete_an_appointment, get_next_available
 from typing import Dict, Tuple
 
 api = AppointmentDto.api
@@ -11,6 +11,7 @@ _appointment = AppointmentDto.appointment
 _appointment_details = AppointmentDto.appointment_details
 _appointment_list_api = AppointmentDto.appointment_list_api
 _appointment_details_api = AppointmentDto.appointment_details_api
+_appointment_next_available_api = AppointmentDto.appointment_next_available_api
 _appointment_changed_response = AppointmentDto.appointment_changed_response
 
 
@@ -55,6 +56,21 @@ class AppointmentList(Resource):
         data = request.json
         return save_new_appointment(data=data)
 
+
+@api.route('/next-available')
+class AppointmentNextAvailable(Resource):
+
+    @receptionist_token_required
+    @api.doc('Gets the next available time slot by the healthcare professional')
+    @api.marshal_with(_appointment_next_available_api)
+    def get(self):
+        ''' Gets the next availabile time slot '''
+        parser = reqparse.RequestParser()
+        parser.add_argument('healthcare_professional_id', required=True, type=str, help='The healthcare professional ID used for filtering the list of appointments.')
+        parser.add_argument('start_time', type=str, help='The start time used for filtering the list of appointments.')
+        parser.add_argument('end_time', type=str, help='The end time used for filtering the list of appointments.')
+        params = parser.parse_args()
+        return get_next_available(params)
 
 @api.route('/<public_id>')
 @api.param('public_id', 'The appointment identifier')

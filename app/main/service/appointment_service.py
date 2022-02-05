@@ -195,6 +195,112 @@ def get_an_appointment(public_id: str):
     )
     return response_object, 200
 
+def get_next_available(params: Dict[str, str]) -> Tuple[Dict[str, str], int]:
+    print(params)
+    appointments_query = Appointment.query
+
+    if params and params['healthcare_professional_id'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.healthcare_professional_id == params['healthcare_professional_id']
+        )
+
+    if params and params['start_time'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.start_time >= DateTimeUtil.from_iso_datetime_string(params['start_time'])
+        )
+
+    if params and params['end_time'] is not None:
+        appointments_query = appointments_query.filter(
+            Appointment.end_time <= DateTimeUtil.from_iso_datetime_string(params['end_time'])
+        )
+
+    appointments = appointments_query.all()
+    now = datetime.datetime.now()
+    date_format = '%Y-%m-%d %H:%M'
+
+    if len(appointments) == 0:
+        next_hour = now - datetime.timedelta(
+            minutes=now.minute,
+            seconds=now.second,
+        ) + datetime.timedelta(hours=1)
+        next_start_time = next_hour.strftime(date_format)
+        next_end_time = (next_hour + datetime.timedelta(hours=1)).strftime(date_format)
+        response_object = ResponseUtil.produce_common_response_dict(
+            is_success=True,
+            message='Successfully fetched.',
+            payload={
+                'healthcare_professional_id': params['healthcare_professional_id'],
+                'start_time': next_start_time,
+                'end_time': next_end_time,
+            }
+        )
+        return response_object, 200
+    else:
+        available_time_slots = []
+
+        clinic_opening_hour = now - datetime.timedelta(
+            hours=now.hour,
+            minutes=now.minute,
+            seconds=now.second,
+        ) + datetime.timedelta(hours=9)
+        clinic_lunch_hour = clinic_opening_hour + datetime.timedelta(hours=4)
+        clinic_after_lunch_hour = clinic_lunch_hour + datetime.timedelta(hours=1)
+        clinic_closing_hour = clinic_after_lunch_hour + datetime.timedelta(hours=4)
+
+        while clinic_opening_hour < clinic_lunch_hour:
+            available_time_slots.append({
+                'start_time': clinic_opening_hour + datetime.timedelta(hours=1),
+                'end_time': clinic_opening_hour + datetime.timedelta(hours=2),
+            })
+            clinic_opening_hour += datetime.timedelta(hours=1)
+
+        while clinic_after_lunch_hour < clinic_closing_hour:
+            available_time_slots.append({
+                'start_time': clinic_after_lunch_hour + datetime.timedelta(hours=1),
+                'end_time': clinic_after_lunch_hour + datetime.timedelta(hours=2),
+            })
+            clinic_after_lunch_hour += datetime.timedelta(hours=1)
+
+        next_available_time_slot_idx = -1
+
+        for i, time_slot in enumerate(available_time_slots):
+            start_time = time_slot['start_time']
+            end_time = time_slot['end_time']
+
+            if end_time < now or end_time == now:
+                continue
+
+            has_booked = False
+
+            for j, appointment in enumerate(appointments):
+                appointment_start_time = DateTimeUtil.to_local_timezone(appointment['start_time'])
+                appointment_end_time = DateTimeUtil.to_local_timezone(appointment['end_time'])
+
+                if appointment_end_time < now or appointment_end_time == now:
+                    continue
+
+                if appointment_start_time == start_time and appointment_end_time == end_time:
+                    has_booked = True
+
+            if not has_booked:
+                next_available_time_slot_idx = i + 1
+                break
+
+        next_available_time_slot = available_time_slots[next_available_time_slot_idx] if next_available_time_slot_idx < len(available_time_slots) else available_time_slots[next_available_time_slot_idx-1]
+        next_start_time = next_available_time_slot['start_time'].strftime(date_format)
+        next_end_time = next_available_time_slot['end_time'].strftime(date_format)
+        response_object = ResponseUtil.produce_common_response_dict(
+            is_success=True,
+            message='Successfully fetched.',
+            payload={
+                'healthcare_professional_id': params['healthcare_professional_id'],
+                'start_time': next_start_time,
+                'end_time': next_end_time,
+            }
+        )
+        return response_object, 200
+
+
 
 def save_changes(data: Appointment) -> None:
     db.session.add(data)
