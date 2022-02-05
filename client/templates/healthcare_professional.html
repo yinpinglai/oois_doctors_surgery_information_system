@@ -44,8 +44,10 @@
                                 <td>{{appointment.end_time}}</td>
                                 <td>{{appointment.healthcare_professional_id}}</td>
                                 <td>
-                                    {% if user.is_receptionist %}
+                                    {% if user.is_receptionist and appointment.is_pending %}
                                         <button type="button" class="btn btn-danger">Cancel</button>
+                                    {% else %}
+                                        -
                                     {% endif %}
                                 </td>
                             </tr>

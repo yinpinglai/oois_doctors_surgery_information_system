@@ -15,8 +15,6 @@ def create_blueprint(config):
 
             auth_service = AuthService(config)
             try:
-                email = 'kris.lai@gmail.com'
-                password = 'P@ssw0rd'
                 is_success, token = auth_service.login(email, password)
                 if is_success and token is not None:
                     employee = auth_service.get_user_info(token)
