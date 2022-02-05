@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block title %}Find Next Available{% endblock %}
+{% block content %}
+    <h1>Find Next Available</h1>
+    <div class="form-group">
+        <label for="healthcare_professional_id">Select a Healthcare Professional</label>
+        <select id="healthcare_professional_id" name="healthcare_professional_id" class="form-control form-control-lg">
+            {% for healthcare_professional in healthcare_professionals %}
+                <option value="{{healthcare_professional.public_id}}">
+                    {{healthcare_professional.get_position()}} - {{healthcare_professional.name}}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <p id="next-available-time-slot"></p>
+    <div id="make-an-appointment-button-wrapper" class="row-fluid" style="display:none;">
+        <a href="/appointment/new" class="btn btn-primary" role="button">Make an appointment</a>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+    <script>
+        (function($) {
+            "use strict";
+
+            var isInit = true;
+
+            var onGettingAppointmentsSuccessCallback = function (response) {
+                if (response.ok) {
+                    response.json().then(function (data) {
+                        if (data['success'] && data['result']) {
+                            var appointments = data['result'];
+                            console.log(appointments);
+
+                            var now = moment();
+                            var dateFormat = 'YYYY-MM-DD HH:mm';
+
+                            if (appointments.length == 0) {
+                                var nextHour = now.clone().startOf('hour').add('1', 'h');
+                                var nextStartTime = nextHour.format(dateFormat);
+                                var nextEndTime = nextHour.clone().add('1', 'h').format(dateFormat);
+                                $('#next-available-time-slot').text(
+                                    'Next available time slot from ' + nextStartTime + ' to ' + nextEndTime + '.'
+                                );
+                            } else {
+
+                                var availableTimeSlots = [];
+                                var clinicOpeningHour = moment().startOf('day').add('9', 'h');
+                                var clinicLunchHour = clinicOpeningHour.clone().add('4', 'h');
+                                var clinicAfterLunchHour = clinicLunchHour.clone().add('1', 'h');
+                                var clinicClosingHour = clinicAfterLunchHour.clone().add('4', 'h');
+
+                                while (clinicOpeningHour.isBefore(clinicLunchHour)) {
+                                    availableTimeSlots.push({
+                                        'startTime': clinicOpeningHour.clone().add('1', 'h'),
+                                        'endTime': clinicOpeningHour.clone().add('2', 'h')
+                                    });
+                                    clinicOpeningHour.add('1', 'h');
+                                }
+
+                                while (clinicAfterLunchHour.isBefore(clinicClosingHour)) {
+                                    availableTimeSlots.push({
+                                        'startTime': clinicAfterLunchHour.clone().add('1', 'h'),
+                                        'endTime': clinicAfterLunchHour.clone().add('2', 'h')
+                                    });
+                                    clinicAfterLunchHour.add('1', 'h');
+                                }
+
+                                var nextAvailableTimeSlotIndex = -1;
+                                for (var i=0; i<availableTimeSlots.length; i++) {
+                                    var availableTimeSlot = availableTimeSlots[i];
+                                    var startTimeMoment = availableTimeSlot['startTime'];
+                                    var endTimeMoment = availableTimeSlot['endTime'];
+
+                                    if (endTimeMoment.isBefore(now) || endTimeMoment.isSame(now))
+                                        continue;
+
+                                    var hasBooked = false;
+                                    for (var j=0; j<appointments.length; j++) {
+                                        var appointment = appointments[i];
+                                        var localizedStartTimeString = appointment['localized_start_time_string'];
+                                        var localizedEndTimeString = appointment['localized_end_time_string'];
+
+                                        if (!localizedStartTimeString || !localizedEndTimeString)
+                                            continue;
+
+                                        var localizedStartTimeMoment = moment(localizedStartTimeString);
+                                        var localizedEndTimeMoment = moment(localizedEndTimeString);
+
+                                        if (localizedEndTimeMoment.isBefore(now) || localizedEndTimeMoment.isSame(now))
+                                            continue;
+
+                                        if (localizedStartTimeMoment.isSame(startTimeMoment) && localizedEndTimeMoment.isSame(endTimeMoment))
+                                            hasBooked = true;
+                                    }
+
+                                    if (!hasBooked) {
+                                        nextAvailableTimeSlotIndex = i + 1;
+                                        break;
+                                    }
+                                }
+
+                                var nextAvailableTimeSlot = availableTimeSlots[nextAvailableTimeSlotIndex];
+                                var nextStartTime = nextAvailableTimeSlot['startTime'].format(dateFormat);
+                                var nextEndTime = nextAvailableTimeSlot['endTime'].format(dateFormat);
+                                $('#next-available-time-slot').text(
+                                    'Next available time slot starts from ' + nextStartTime + ' to ' + nextEndTime + '.'
+                                );
+                                $('#make-an-appointment-button-wrapper').css('display', 'block');
+                                $('#make-an-appointment-button-wrapper a').attr('href', '/appointment/new?' + 'start_time=' + encodeURIComponent(nextStartTime) + '&end_time=' + encodeURIComponent(nextEndTime));
+                            }
+                        }
+                    });
+                }
+            };
+
+            var onGettingAppointmentsErrorCallback = function (error) {
+                console.error(error);
+            };
+
+            var handleOnHealthcareProfessionalChange = function(id) {
+                var startTime = moment().startOf('day').add('9', 'h');
+                var endTime = startTime.clone().add('8', 'h');
+                getAppointments(
+                    id,
+                    startTime.toISOString(),
+                    endTime.toISOString(),
+                    onGettingAppointmentsSuccessCallback,
+                    onGettingAppointmentsErrorCallback,
+                );
+            };
+
+            $('#healthcare_professional_id').change(function (e) {
+                var selectedHealthcareProfessionalID = event.target.value;
+                handleOnHealthcareProfessionalChange(selectedHealthcareProfessionalID);
+            });
+
+            $(document).ready(function () {
+                if (isInit) {
+                    var firstOption = $('#healthcare_professional_id').children(':first');
+                    var healthcareProfessionalID = firstOption.attr('value');
+                    if (healthcareProfessionalID) {
+                        handleOnHealthcareProfessionalChange(healthcareProfessionalID);
+                    }
+                    isInit = false;
+                }
+            });
+        })(jQuery);
+    </script>
+{% endblock %}
+

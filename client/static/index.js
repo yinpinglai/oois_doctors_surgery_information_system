@@ -103,3 +103,11 @@ function cancelPatientAppointment(patient_id, appointment_id) {
         window.location.href = '/patient/' + patient_id;
     });
 }
+
+function getAppointments(healthcare_professional_id, start_time, end_time, successCallback, errorCallback) {
+    fetch('/appointment-schedule?' + new URLSearchParams({
+        'healthcare_professional_id': healthcare_professional_id,
+        'start_time': start_time,
+        'end_time': end_time
+    })).then(successCallback).catch(errorCallback);
+}

@@ -128,22 +128,18 @@ class AppointmentService(BaseService):
             print(e)
             raise e
 
-    def get_appointment_list(self, healthcare_professional_id: str = None) -> List[Appointment]:
+    def get_appointment_list(self, params: Dict[str, Any] = {}) -> List[Appointment]:
         '''
         Gets the list of appointment
 
-        :param healthcare_professional_id - The healthcare professional ID
+        :param params - The request query parameters
         :return appointment_list - The list of appointment
         :throws UnauthenticatedException | ApiCallException | Exception
         '''
         resource_url = self.config.APPOINTMENT_API_GET_APPOINTMENT_LIST_RESOURCE_URL
-        params = {}
 
-        if healthcare_professional_id is not None:
+        if params:
             resource_url += '/'
-            params = {
-                'healthcare_professional_id': healthcare_professional_id,
-            }
 
         try:
             status_code, data = self.get(resource_url, params=params)

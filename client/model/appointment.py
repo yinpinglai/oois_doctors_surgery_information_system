@@ -134,6 +134,8 @@ class Appointment:
             'class': self.event_class,
             'start': self.start,
             'end': self.end,
+            'localized_start_time_string': self.localized_start_time_string,
+            'localized_end_time_string': self.localized_end_time_string,
         }
 
     @property

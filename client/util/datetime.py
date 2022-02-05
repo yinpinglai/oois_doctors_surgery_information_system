@@ -42,3 +42,14 @@ class DateTimeUtil:
         offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
         return utc_datetime_instance + offset
 
+    @staticmethod
+    def to_iso8601_datetime_string(utc_milliseconds: str) -> str:
+        '''
+        Converts UTC milliseconds to the ISO8601 datetime string
+
+        :param utc_milliseconds - The UTC milliseconds
+        :return iso8604_datetime_string - The ISO8601 datetime string of parsed UTC milliseconds
+        '''
+        datetime_instance = datetime.fromtimestamp(int(utc_milliseconds)/1000.0)
+        return datetime_instance.isoformat()
+

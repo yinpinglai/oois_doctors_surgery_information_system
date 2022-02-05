@@ -7,11 +7,11 @@ from client.model.prescription import Prescription
 from client.enum.appointment_type import AppointmentType
 from client.enum.prescription_type import PrescriptionType
 from client.util.common import CommonUtil
+from client.util.datetime import DateTimeUtil
 from client.service.patient_service import PatientService
 from client.service.appointment_service import AppointmentService
 from client.service.prescription_service import PrescriptionService
 from client.service.healthcare_professional_service import HealthcareProfessionalService
-from client.util.datetime import DateTimeUtil
 
 def create_blueprint(config: Dict[str, str]) -> Blueprint:
     views = Blueprint('views', __name__)
@@ -29,6 +29,10 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
     @views.route('/appointment/new', methods=['GET'])
     @login_required
     def appointment_form():
+        args = request.args
+        start_time = args['start_time'] if 'start_time' in args else None
+        end_time = args['end_time'] if 'end_time' in args else None
+
         headers = CommonUtil.construct_request_headers(current_user.access_token)
         patient_service = PatientService(config, headers)
         healthcare_professional_service = HealthcareProfessionalService(config, headers)
@@ -36,7 +40,14 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
         patients = patient_service.get_patient_list()
         healthcare_professionals = healthcare_professional_service.get_healthcare_professional_list()
 
-        return render_template('appointment_form.html', patients=patients, healthcare_professionals=healthcare_professionals, user=current_user)
+        return render_template(
+            'appointment_form.html',
+            patients=patients,
+            healthcare_professionals=healthcare_professionals,
+            start_time=start_time,
+            end_time=end_time,
+            user=current_user,
+        )
 
     @views.route('/appointment/new/<public_id>', methods=['GET'])
     @login_required
@@ -53,10 +64,36 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
     @views.route('/appointment-schedule', methods=['GET'])
     @login_required
     def appointment_schedule():
-        is_healthcare_professional = current_user.is_doctor or current_user.is_nurse
+        args = request.args
+        date_from = args['from'] if 'from' in args else None
+        date_to = args['to'] if 'to' in args else None
+
+        start_time_iso8601_string = args['start_time'] if 'start_time' in args else None
+        end_time_iso8601_string = args['end_time'] if 'end_time' in args else None
+        healthcare_professional_id = args['healthcare_professional_id'] if 'healthcare_professional_id' in args else None
+
+        params = {}
+
+        if date_from is not None:
+            params['start_time'] = DateTimeUtil.to_iso8601_datetime_string(date_from)
+        elif start_time_iso8601_string is not None:
+            params['start_time'] = start_time_iso8601_string
+
+        if date_to is not None:
+            params['end_time'] = DateTimeUtil.to_iso8601_datetime_string(date_to)
+        elif end_time_iso8601_string is not None:
+            params['end_time'] = end_time_iso8601_string
+
+        if healthcare_professional_id is not None:
+            params['healthcare_professional_id'] = healthcare_professional_id
+        else:
+            is_healthcare_professional = current_user.is_doctor or current_user.is_nurse
+            if is_healthcare_professional:
+                params['healthcare_professional_id'] = current_user.public_id
+
         headers = CommonUtil.construct_request_headers(current_user.access_token)
         appointment_service = AppointmentService(config, headers)
-        appointment_list = appointment_service.get_appointment_list(current_user.public_id) if is_healthcare_professional else appointment_service.get_appointment_list()
+        appointment_list = appointment_service.get_appointment_list(params)
         appointments = [appointment.to_calendar_event() for appointment in appointment_list]
         resp = jsonify({
             'success' : 1,
@@ -64,6 +101,15 @@ def create_blueprint(config: Dict[str, str]) -> Blueprint:
         })
         resp.status_code = 200
         return resp
+
+    @views.route('/appointment/next-available', methods=['GET'])
+    @login_required
+    def appointment_next_available():
+        headers = CommonUtil.construct_request_headers(current_user.access_token)
+        healthcare_professional_service = HealthcareProfessionalService(config, headers)
+
+        healthcare_professionals = healthcare_professional_service.get_healthcare_professional_list()
+        return render_template('find_next_available.html', healthcare_professionals=healthcare_professionals, user=current_user)
 
     @views.route('/appointment', methods=['POST'])
     @login_required

@@ -39,7 +39,11 @@
     <div class="form-group">
         <label for="start_time">Start Time</label>
         <div class='input-group date' id='start_time_picker'>
-            <input type='text' id="start_time" name="start_time" class="form-control" />
+            {% if start_time %}
+                <input type='text' id="start_time" name="start_time" class="form-control" value="{{start_time}}" />
+            {% else %}
+                <input type='text' id="start_time" name="start_time" class="form-control" />
+            {% endif %}
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span>
             </span>
@@ -48,7 +52,11 @@
     <div class="form-group">
         <label for="end_time">End Time</label>
         <div class='input-group date' id='end_time_picker'>
-            <input type='text' id="end_time" name="end_time" class="form-control" />
+            {% if end_time %}
+                <input type='text' id="end_time" name="end_time" class="form-control" value="{{end_time}}" />
+            {% else %}
+                <input type='text' id="end_time" name="end_time" class="form-control" />
+            {% endif %}
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span>
             </span>
@@ -66,10 +74,10 @@
     (function($) {
         "use strict";
         $('#start_time').datetimepicker({
-            format: 'YYYY-MM-DD hh:mm:ss'
+            format: 'YYYY-MM-DD hh:mm'
         });
         $('#end_time').datetimepicker({
-            format: 'YYYY-MM-DD hh:mm:ss'
+            format: 'YYYY-MM-DD hh:mm'
         });
     })(jQuery);
 </script>
