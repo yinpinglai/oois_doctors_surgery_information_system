@@ -25,7 +25,14 @@ The frontend application is a web application. It provides an interface for acce
 
 ## Installation
 
-The DSIS requires [Python](https://www.python.org/downloads/source/) v3.7+ to run.
+The DSIS requires [Python](https://www.python.org/downloads/source/) v3.6.8+ to run.
+
+Install required packages
+```sh
+sudo apt-get update
+sudo apt-get install python3-venv
+sudo apt-get install mysql-server
+```
 
 Create a virtual environment
 
@@ -64,6 +71,14 @@ python3 manage.py db migrate --message 'initial database migration'
 python3 manage.py db upgrade
 ```
 
+Create a database user for the backend application
+```sh
+mysql -u root -p
+CREATE USER 'oois_server' IDENTIFIED BY 'oois_server';
+GRANT ALL PRIVILEGES ON oois_assignment.* TO oois_server;
+SHOW GRANTS FOR oois_server;
+```
+
 Start the backend application
 ```sh
 cd /project_root_directory
@@ -99,6 +114,14 @@ cd /project_root_directory
 mysql -u root -p
 source ./init_test_db.sql;
 exit;
+```
+
+Create a database user for the testing environment
+```sh
+mysql -u root -p
+CREATE USER 'oois_test' IDENTIFIED BY 'oois_test';
+GRANT ALL PRIVILEGES ON oois_assignment_test.* TO oois_test;
+SHOW GRANTS FOR oois_test;
 ```
 
 Run all unit tests
