@@ -1,6 +1,10 @@
 # Doctors' Surgery Information System (DSIS)
 *A system designed for managing the appointment schedule for healthcare professionals*
 
+## Screenshots
+![Portal](./screenshots/portal.png)
+![Appointment Schedule](./screenshots/appointment_schedule.png)
+
 ## Design
 The DSIS has separated the front-end and the back-end applications. There are two main components in the system. We developed both applications with the Python programming language mainly.
 
